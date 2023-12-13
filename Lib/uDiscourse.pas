@@ -95,7 +95,7 @@ begin
   try
     RESTRequest.Resource := 'admin/users/list/active.json';
     RESTRequest.Execute;
-    JSONValue := TJSONObject.ParseJSONValue(RESTRequest.Response.Content);
+    JSONValue := RESTRequest.Response.JSONValue;
     try
       if JSONValue is TJSONArray then
       begin
@@ -123,7 +123,7 @@ begin
         end;
       end;
     finally
-      JSONValue.Free;
+
     end;
   finally
     RESTRequest.Free;

@@ -60,17 +60,19 @@ type
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
     function CreatePost(const Title, Content: string): Boolean;
-    function ListPosts: TObjectList<TWordPressPost>;
+    function ListPosts(status: string = 'publish'): TObjectList<TWordPressPost>;
     function DeletePost(const PostID: Integer): Boolean;
   public // Page functions
     function CreatePage(const Title, Content: string; const Status: string = 'draft'): Boolean;
-    function ListPages: TObjectList<TWordPressPage>;
+    function ListPages(status: string = 'publish'): TObjectList<TWordPressPage>;
     function DeletePage(const PageID: Integer): Boolean;
   public  // User functions
     function CreateUser(const Username, Email, Password: string; const Role: string = 'subscriber'): Boolean;
     function ListUsers: TObjectList<TWordPressUser>;
     function RetrieveUser(const Username: string = 'me'): TWordPressUser;
     function DeleteUser(const Username: string): Boolean;
+  public
+
   end;
 
 implementation
@@ -116,7 +118,7 @@ begin
     try
       JSONBody.AddPair('title', Title);
       JSONBody.AddPair('content', Content);
-      JSONBody.AddPair('status', 'publish');
+      JSONBody.AddPair('status', 'draft');
 
       RestRequest.AddBody(JSONBody);
 
@@ -238,13 +240,9 @@ begin
 
     if RestResponse.StatusCode = 201 then  // HTTP 201 Created
     begin
-      JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
-      try
-        if Assigned(JSONValue) and (JSONValue is TJSONObject) then
-          Result := True;  // User created successfully
-      finally
-        JSONValue.Free;
-      end;
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+        Result := True;  // User created successfully
     end;
   finally
     RestRequest.Free;
@@ -286,22 +284,18 @@ begin
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
-      JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
-      try
-        if Assigned(JSONValue) and (JSONValue is TJSONObject) then
-        begin
-          JSONUser := JSONValue as TJSONObject;
-          Result := TWordPressUser.Create;
-          Result.ID := JSONUser.GetValue<Integer>('id');
-          Result.Name := JSONUser.GetValue<string>('name');
-          Result.Slug := JSONUser.GetValue<string>('slug');
-          Result.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
-          Result.URL := JSONUser.GetValue<string>('url');
-          Result.Description := JSONUser.GetValue<string>('description');
-          // ... extract other fields as needed ...
-        end;
-      finally
-        JSONValue.Free;
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONUser := JSONValue as TJSONObject;
+        Result := TWordPressUser.Create;
+        Result.ID := JSONUser.GetValue<Integer>('id');
+        Result.Name := JSONUser.GetValue<string>('name');
+        Result.Slug := JSONUser.GetValue<string>('slug');
+        Result.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
+        Result.URL := JSONUser.GetValue<string>('url');
+        Result.Description := JSONUser.GetValue<string>('description');
+        // ... extract other fields as needed ...
       end;
     end;
   finally
@@ -356,7 +350,7 @@ begin
 end;
 
 
-function TWordPressApi.ListPosts: TObjectList<TWordPressPost>;
+function TWordPressApi.ListPosts(status: string = 'publish'): TObjectList<TWordPressPost>;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -384,32 +378,29 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/posts';
+    RestRequest.Params.AddItem('status', status);
 
     RestRequest.Execute;
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
-      JSONArray := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONArray;
-      try
-        for I := 0 to JSONArray.Count - 1 do
-        begin
-          JSONPost := JSONArray.Items[I] as TJSONObject;
-          Post := TWordPressPost.Create;
-          Post.ID := JSONPost.GetValue<Integer>('id');
-          Post.Date := ISO8601ToDate(JSONPost.GetValue<string>('date'));
-          Post.Slug := JSONPost.GetValue<string>('slug');
-          Post.Status := JSONPost.GetValue<string>('status');
-          Post.&Type := JSONPost.GetValue<string>('type');
-          Post.Title := JSONPost.GetValue<string>('title.rendered');
-          Post.Content := JSONPost.GetValue<string>('content.rendered');
-          Post.Author := JSONPost.GetValue<Integer>('author');
-          Post.Excerpt := JSONPost.GetValue<string>('excerpt.rendered');
-          // ... extract other fields as needed ...
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONPost := JSONArray.Items[I] as TJSONObject;
+        Post := TWordPressPost.Create;
+        Post.ID := JSONPost.GetValue<Integer>('id');
+        Post.Date := ISO8601ToDate(JSONPost.GetValue<string>('date'));
+        Post.Slug := JSONPost.GetValue<string>('slug');
+        Post.Status := JSONPost.GetValue<string>('status');
+        Post.&Type := JSONPost.GetValue<string>('type');
+        Post.Title := JSONPost.GetValue<string>('title.rendered');
+        Post.Content := JSONPost.GetValue<string>('content.rendered');
+        Post.Author := JSONPost.GetValue<Integer>('author');
+        Post.Excerpt := JSONPost.GetValue<string>('excerpt.rendered');
+        // ... extract other fields as needed ...
 
-          Result.Add(Post);
-        end;
-      finally
-        FreeandNil(JSONArray);
+        Result.Add(Post);
       end;
     end;
   finally
@@ -494,24 +485,20 @@ begin
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
-      JSONArray := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONArray;
-      try
-        for I := 0 to JSONArray.Count - 1 do
-        begin
-          JSONUser := JSONArray.Items[I] as TJSONObject;
-          User := TWordPressUser.Create;
-          User.ID := JSONUser.GetValue<Integer>('id');
-          User.Name := JSONUser.GetValue<string>('name');
-          User.Slug := JSONUser.GetValue<string>('slug');
-          User.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
-          User.URL := JSONUser.GetValue<string>('url');
-          User.Description := JSONUser.GetValue<string>('description');
-          // ... extract other fields as needed ...
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONUser := JSONArray.Items[I] as TJSONObject;
+        User := TWordPressUser.Create;
+        User.ID := JSONUser.GetValue<Integer>('id');
+        User.Name := JSONUser.GetValue<string>('name');
+        User.Slug := JSONUser.GetValue<string>('slug');
+        User.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
+        User.URL := JSONUser.GetValue<string>('url');
+        User.Description := JSONUser.GetValue<string>('description');
+        // ... extract other fields as needed ...
 
-          Result.Add(User);
-        end;
-      finally
-        FreeandNil(JSONArray);
+        Result.Add(User);
       end;
     end;
   finally
@@ -522,7 +509,7 @@ begin
   end;
 end;
 
-function TWordPressApi.ListPages: TObjectList<TWordPressPage>;
+function TWordPressApi.ListPages(status: string): TObjectList<TWordPressPage>;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -550,32 +537,29 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/pages';
+    RestRequest.Params.AddItem('status', status);
 
     RestRequest.Execute;
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
-      JSONArray := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONArray;
-      try
-        for I := 0 to JSONArray.Count - 1 do
-        begin
-          JSONPage := JSONArray.Items[I] as TJSONObject;
-          Page := TWordPressPage.Create;
-          Page.ID := JSONPage.GetValue<Integer>('id');
-          Page.Date := ISO8601ToDate(JSONPage.GetValue<string>('date'));
-          Page.Slug := JSONPage.GetValue<string>('slug');
-          Page.Status := JSONPage.GetValue<string>('status');
-          Page.&Type := JSONPage.GetValue<string>('type');
-          Page.Title := JSONPage.GetValue<string>('title.rendered');
-          Page.Content := JSONPage.GetValue<string>('content.rendered');
-          Page.Author := JSONPage.GetValue<Integer>('author');
-          Page.Excerpt := JSONPage.GetValue<string>('excerpt.rendered');
-          // ... extract other fields as needed ...
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONPage := JSONArray.Items[I] as TJSONObject;
+        Page := TWordPressPage.Create;
+        Page.ID := JSONPage.GetValue<Integer>('id');
+        Page.Date := ISO8601ToDate(JSONPage.GetValue<string>('date'));
+        Page.Slug := JSONPage.GetValue<string>('slug');
+        Page.Status := JSONPage.GetValue<string>('status');
+        Page.&Type := JSONPage.GetValue<string>('type');
+        Page.Title := JSONPage.GetValue<string>('title.rendered');
+        Page.Content := JSONPage.GetValue<string>('content.rendered');
+        Page.Author := JSONPage.GetValue<Integer>('author');
+        Page.Excerpt := JSONPage.GetValue<string>('excerpt.rendered');
+        // ... extract other fields as needed ...
 
-          Result.Add(Page);
-        end;
-      finally
-        FreeAndNil(JSONArray);
+        Result.Add(Page);
       end;
     end;
   finally

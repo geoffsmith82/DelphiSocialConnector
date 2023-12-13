@@ -66,19 +66,30 @@ var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
   i : Integer;
+  DeleteID : Integer;
 begin
-  posts := FWp.ListPosts;
+//  FWp.CreatePost('Test Title', 'Test Content');
+  DeleteID := -1;
+  posts := FWp.ListPosts('draft');
   try
+    Memo1.Lines.Add('=== POSTS ===');
     for i := 0 to posts.Count - 1 do
     begin
       Memo1.Lines.Add(posts[i].Title);
+      if posts[i].Title = 'Test Title' then
+      begin
+        DeleteID := posts[i].ID;
+      end;
     end;
+
+    FWp.DeletePost(DeleteID);
   finally
     FreeAndNil(posts);
   end;
 
-  pages := FWp.ListPages;
+  pages := FWp.ListPages('publish');
   try
+    Memo1.Lines.Add('=== PAGES ===');
     for i := 0 to pages.Count - 1 do
     begin
       Memo1.Lines.Add(pages[i].Title);
