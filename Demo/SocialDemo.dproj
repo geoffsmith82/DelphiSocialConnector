@@ -93,6 +93,7 @@
         <DCCReference Include="..\Lib\uFacebook.pas"/>
         <DCCReference Include="..\Lib\uTwitter.pas"/>
         <DCCReference Include="..\Lib\uWordpress.pas"/>
+        <DCCReference Include="..\Lib\uDiscourse.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

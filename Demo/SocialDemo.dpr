@@ -18,7 +18,8 @@ uses
   uSocialMediaDemo in 'uSocialMediaDemo.pas' {frmSocialMainForm},
   uFacebook in '..\Lib\uFacebook.pas',
   uTwitter in '..\Lib\uTwitter.pas',
-  uWordpress in '..\Lib\uWordpress.pas';
+  uWordpress in '..\Lib\uWordpress.pas',
+  uDiscourse in '..\Lib\uDiscourse.pas';
 
 {$R *.res}
 
