@@ -13,6 +13,15 @@ uses
   ;
 
 type
+  TWordPressMedia = class
+  public
+    ID: Integer;
+    Title: string;
+    URL: string;
+    Description: string;
+    MediaType: string;
+  end;
+
   TWordPressPost = class
     ID: Integer;
     Date: TDateTime;
@@ -73,6 +82,9 @@ type
     function DeleteUser(const Username: string): Boolean;
   public
     function GetSiteSettings: TStringList;
+  public
+    function ListMedia: TObjectList<TWordPressMedia>;
+    function DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean = False): Boolean;
   end;
 
 implementation
@@ -659,6 +671,104 @@ begin
     Authenticator.Free;
   end;
 end;
+
+function TWordPressApi.ListMedia: TObjectList<TWordPressMedia>;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONArray: TJSONArray;
+  I: Integer;
+  MediaItem: TWordPressMedia;
+  JSONMedia: TJSONObject;
+begin
+  Result := TObjectList<TWordPressMedia>.Create;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/media';
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONMedia := JSONArray.Items[I] as TJSONObject;
+        MediaItem := TWordPressMedia.Create;
+        MediaItem.ID := JSONMedia.GetValue<Integer>('id');
+        MediaItem.Title := JSONMedia.GetValue<string>('title.rendered');
+        MediaItem.URL := JSONMedia.GetValue<string>('source_url');
+        // ... extract other fields as needed ...
+
+        Result.Add(MediaItem);
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+
+function TWordPressApi.DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean): Boolean;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+begin
+  Result := False;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmDELETE;
+    RestRequest.Resource := 'wp/v2/media/{id}';
+    RestRequest.AddParameter('id', IntToStr(MediaID), pkURLSEGMENT);
+    if ForceDelete then
+      RestRequest.AddParameter('force', 'true', pkGETorPOST);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      Result := True;  // Media deleted successfully
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
 
 
 end.

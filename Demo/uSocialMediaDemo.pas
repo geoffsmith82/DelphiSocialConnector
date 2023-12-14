@@ -69,6 +69,7 @@ procedure TfrmSocialMainForm.Button1Click(Sender: TObject);
 var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
+  media : TObjectList<TWordPressMedia>;
   i : Integer;
   DeleteID : Integer;
   Settings : TStringList;
@@ -102,8 +103,21 @@ begin
   finally
     FreeAndNil(pages);
   end;
+
+  media := FWp.ListMedia;
+  try
+    Memo1.Lines.Add('=== Media ===');
+    for i := 0 to media.Count - 1 do
+    begin
+      Memo1.Lines.Add(media[i].Title);
+    end;
+  finally
+    FreeAndNil(media);
+  end;
+
   Settings := FWp.GetSiteSettings;
   try
+    Memo1.Lines.Add('=== SITE SETTINGS ===');
     Memo1.Lines.AddStrings(Settings);
   finally
     FreeAndNil(Settings);
