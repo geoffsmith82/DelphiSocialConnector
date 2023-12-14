@@ -13,6 +13,7 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  uDiscourse,
   uWordpress,
   uTwitter
   ;
@@ -24,6 +25,8 @@ type
     btnTweet: TButton;
     Button3: TButton;
     Button2: TButton;
+    btnDiscourse: TButton;
+    procedure btnDiscourseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -34,6 +37,7 @@ type
     FSettings : TInifile;
     FWp : TWordPressApi;
     FTwitter: TTwitterApi;
+    FDiscourse: TDiscourseAPI;
   public
     { Public declarations }
   end;
@@ -47,6 +51,23 @@ implementation
 
 uses uWebBrowswer;
 
+procedure TfrmSocialMainForm.btnDiscourseClick(Sender: TObject);
+var
+  posts : TObjectList<TDiscoursePost>;
+  I: Integer;
+begin
+  posts := FDiscourse.GetPosts;
+  try
+    for I := 0 to posts.Count - 1 do
+    begin
+      Memo1.Lines.Add(posts[i].Id.ToString + ' ' + posts[i].Author);
+      Memo1.Lines.Add(posts[i].Content);
+    end;
+  finally
+    FreeAndNil(posts);
+  end;
+end;
+
 procedure TfrmSocialMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FWp);
@@ -57,12 +78,21 @@ procedure TfrmSocialMainForm.FormCreate(Sender: TObject);
 var
   WordpressUsername : string;
   WordpressPassword : string;
+  DiscourseBaseURL : string;
+  DiscourseAPIKey : string;
+  DiscourseUsername : string;
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
   WordpressPassword := FSettings.ReadString('Wordpress', 'Password', '');
 
   FWp := TWordPressApi.Create('https://www.readabouttech.info/wp-json/', WordpressUsername, WordpressPassword);
+
+  DiscourseUsername := FSettings.ReadString('Discourse', 'Username', '');
+  DiscourseBaseURL := FSettings.ReadString('Discourse', 'BaseURL', '');
+  DiscourseAPIKey := FSettings.ReadString('Discourse', 'APIKey', '');
+
+  FDiscourse := TDiscourseAPI.Create(DiscourseBaseURL, DiscourseAPIKey, DiscourseUsername);
 end;
 
 procedure TfrmSocialMainForm.Button1Click(Sender: TObject);
