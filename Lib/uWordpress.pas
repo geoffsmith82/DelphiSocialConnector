@@ -91,7 +91,9 @@ type
 implementation
 
 uses
-  System.DateUtils;
+  System.DateUtils,
+  System.Net.Mime
+  ;
 
 constructor TWordPressApi.Create(const Endpoint, Username, Password: string);
 begin
@@ -682,6 +684,9 @@ var
   FileStream: TFileStream;
   JSONValue: TJSONValue;
   JSONMedia: TJSONObject;
+  mime : TMimeTypes;
+  mimeType : string;
+  kind : TMimeTypes.TKind;
 begin
   Result := nil;
 
@@ -697,14 +702,28 @@ begin
     Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
     RestClient.Authenticator := Authenticator;
 
+
     RestRequest.Client := RestClient;
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmPOST;
     RestRequest.Resource := 'wp/v2/media';
 
     // Set header for file upload
-    RestRequest.Params.AddHeader('Content-Disposition', 'attachment; filename="' + ExtractFileName(FilePath) + '"');
-    RestRequest.Params.AddHeader('Content-Type', 'application/octet-stream');
+    RestRequest.Params.AddItem('Content-Disposition', 'attachment; filename="' + ExtractFileName(FilePath) + '"', pkHTTPHEADER, [poDoNotEncode]);
+
+    mime := TMimeTypes.Create;
+    try
+      mime.AddDefTypes;
+      if mime.GetFileInfo(FilePath, mimeType, kind) then
+      begin
+        RestRequest.Params.AddHeader('Content-Type', mimeType);//'application/octet-stream');
+      end;
+    finally
+      FreeAndNil(mime);
+    end;
+    if not Title.IsEmpty then
+      RestRequest.Params.AddItem('title', Title, pkQUERY);
+
     RestRequest.Params.AddHeader('Accept', 'application/json');
 
     // Load file

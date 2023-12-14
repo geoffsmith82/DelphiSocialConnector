@@ -73,6 +73,8 @@ var
   i : Integer;
   DeleteID : Integer;
   Settings : TStringList;
+  mediaItem: TWordPressMedia;
+  filename : string;
 begin
 //  FWp.CreatePost('Test Title', 'Test Content');
   DeleteID := -1;
@@ -104,9 +106,15 @@ begin
     FreeAndNil(pages);
   end;
 
+  Memo1.Lines.Add('=== Media ===');
+  filename := 'D:\ADUG\Symposium2023\advert.png';
+  mediaItem := FWp.CreateMedia(filename, 'Test Image Upload');
+  FreeAndNil(mediaItem);
+  Memo1.Lines.Add('Uploaded MediaID: ' + mediaItem.ID.ToString);
+
   mediaList := FWp.ListMedia;
   try
-    Memo1.Lines.Add('=== Media ===');
+
     for i := 0 to mediaList.Count - 1 do
     begin
       Memo1.Lines.Add(mediaList[i].Title);
