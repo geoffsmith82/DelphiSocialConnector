@@ -83,6 +83,7 @@ type
   public
     function GetSiteSettings: TStringList;
   public
+    function CreateMedia(const FilePath: string;  const Title: string = ''): TWordPressMedia;
     function ListMedia: TObjectList<TWordPressMedia>;
     function DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean = False): Boolean;
   end;
@@ -665,6 +666,68 @@ begin
       end;
     end;
   finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.CreateMedia(const FilePath: string; const Title: string = ''): TWordPressMedia;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  FileStream: TFileStream;
+  JSONValue: TJSONValue;
+  JSONMedia: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  FileStream := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST;
+    RestRequest.Resource := 'wp/v2/media';
+
+    // Set header for file upload
+    RestRequest.Params.AddHeader('Content-Disposition', 'attachment; filename="' + ExtractFileName(FilePath) + '"');
+    RestRequest.Params.AddHeader('Content-Type', 'application/octet-stream');
+    RestRequest.Params.AddHeader('Accept', 'application/json');
+
+    // Load file
+    FileStream := TFileStream.Create(FilePath, fmOpenRead or fmShareDenyWrite);
+    RestRequest.AddBody(FileStream, ctAPPLICATION_OCTET_STREAM);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 201 then  // HTTP 201 Created
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONMedia := JSONValue as TJSONObject;
+        Result := TWordPressMedia.Create;
+        Result.ID := JSONMedia.GetValue<Integer>('id');
+        Result.Title := JSONMedia.GetValue<string>('title.rendered');
+        Result.URL := JSONMedia.GetValue<string>('source_url');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    FileStream.Free;
     RestRequest.Free;
     RestResponse.Free;
     RestClient.Free;
