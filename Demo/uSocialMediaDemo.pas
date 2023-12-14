@@ -71,6 +71,7 @@ var
   pages : TObjectList<TWordPressPage>;
   i : Integer;
   DeleteID : Integer;
+  Settings : TStringList;
 begin
 //  FWp.CreatePost('Test Title', 'Test Content');
   DeleteID := -1;
@@ -100,6 +101,12 @@ begin
     end;
   finally
     FreeAndNil(pages);
+  end;
+  Settings := FWp.GetSiteSettings;
+  try
+    Memo1.Lines.AddStrings(Settings);
+  finally
+    FreeAndNil(Settings);
   end;
 end;
 

@@ -72,7 +72,7 @@ type
     function RetrieveUser(const Username: string = 'me'): TWordPressUser;
     function DeleteUser(const Username: string): Boolean;
   public
-
+    function GetSiteSettings: TStringList;
   end;
 
 implementation
@@ -601,6 +601,56 @@ begin
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
       Result := True;  // Page deleted successfully
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.GetSiteSettings: TStringList;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONObj: TJSONObject;
+  Pair: TJSONPair;
+begin
+  Result := TStringList.Create;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/settings';
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONObj := JSONValue as TJSONObject;
+        for Pair in JSONObj do
+        begin
+          Result.AddPair(Pair.JsonString.Value , Pair.JsonValue.Value);
+        end;
+      end;
     end;
   finally
     RestRequest.Free;
