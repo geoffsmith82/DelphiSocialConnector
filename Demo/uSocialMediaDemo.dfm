@@ -24,7 +24,7 @@ object frmSocialMainForm: TfrmSocialMainForm
   end
   object Button1: TButton
     Left = 504
-    Top = 16
+    Top = 25
     Width = 75
     Height = 25
     Caption = 'Button1'
@@ -47,5 +47,14 @@ object frmSocialMainForm: TfrmSocialMainForm
     Height = 25
     Caption = 'Authenticate'
     TabOrder = 3
+  end
+  object Button2: TButton
+    Left = 240
+    Top = 16
+    Width = 97
+    Height = 25
+    Caption = 'Web Browser'
+    TabOrder = 4
+    OnClick = Button2Click
   end
 end

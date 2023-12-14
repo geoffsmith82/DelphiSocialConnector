@@ -19,7 +19,8 @@ uses
   uFacebook in '..\Lib\uFacebook.pas',
   uTwitter in '..\Lib\uTwitter.pas',
   uWordpress in '..\Lib\uWordpress.pas',
-  uDiscourse in '..\Lib\uDiscourse.pas';
+  uDiscourse in '..\Lib\uDiscourse.pas',
+  uWebBrowswer in 'uWebBrowswer.pas' {Form1};
 
 {$R *.res}
 
@@ -27,6 +28,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmSocialMainForm, frmSocialMainForm);
+  Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
 

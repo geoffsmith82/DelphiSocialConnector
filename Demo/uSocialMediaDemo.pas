@@ -23,10 +23,12 @@ type
     Button1: TButton;
     btnTweet: TButton;
     Button3: TButton;
+    Button2: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure btnTweetClick(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TInifile;
@@ -42,6 +44,8 @@ var
 implementation
 
 {$R *.dfm}
+
+uses uWebBrowswer;
 
 procedure TfrmSocialMainForm.FormDestroy(Sender: TObject);
 begin
@@ -117,6 +121,11 @@ begin
   finally
     FreeAndNil(FTwitter);
   end;
+end;
+
+procedure TfrmSocialMainForm.Button2Click(Sender: TObject);
+begin
+  Form1.ShowModal;
 end;
 
 end.
