@@ -7,12 +7,22 @@ uses
   System.Classes,
   System.JSON,
   System.Generics.Collections,
+  System.Generics.Defaults,
   REST.Client,
   REST.Types,
   REST.Authenticator.Basic
   ;
 
 type
+ TWordPressTag = class
+  public
+    ID: Integer;
+    Name: string;
+    Slug: string;
+    Description: string;
+    // ... other fields as needed ...
+  end;
+
   TWordPressCategory = class
   public
     ID: Integer;
@@ -101,6 +111,12 @@ type
     function RetrieveCategory(const CategoryID: Integer): TWordPressCategory;
     function ListCategories: TObjectList<TWordPressCategory>;
     function DeleteCategory(const CategoryID: Integer): Boolean;
+  public
+    function CreateTag(const Name, Slug, Description: string): TWordPressTag;
+    function UpdateTag(const TagID: Integer; const Name, Slug, Description: string): TWordPressTag;
+    function ListTags: TObjectList<TWordPressTag>;
+    function RetrieveTag(const TagID: Integer): TWordPressTag;
+    function DeleteTag(const TagID: Integer): Boolean;
   end;
 
 implementation
@@ -845,7 +861,7 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/media/{id}';
-    RestRequest.AddParameter('id', IntToStr(MediaID), pkURLSEGMENT);
+    RestRequest.AddParameter('id', MediaID.ToString, pkURLSEGMENT);
 
     RestRequest.Execute;
 
@@ -894,11 +910,13 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmDELETE;
     RestRequest.Resource := 'wp/v2/media/{id}';
-    RestRequest.AddParameter('id', IntToStr(MediaID), pkURLSEGMENT);
+    RestRequest.AddParameter('id', MediaID.ToString, pkURLSEGMENT);
     if ForceDelete then
       RestRequest.AddParameter('force', 'true', pkGETorPOST);
 
     RestRequest.Execute;
+
+
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
@@ -918,7 +936,6 @@ var
   RestRequest: TRESTRequest;
   RestResponse: TRESTResponse;
   Authenticator: THTTPBasicAuthenticator;
-  CategoryJSON: TJSONObject;
   JSONValue: TJSONValue;
 begin
   Result := nil;
@@ -938,21 +955,14 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmPOST;
     RestRequest.Resource := 'wp/v2/categories';
-
-    // Create JSON object with category details
-    CategoryJSON := TJSONObject.Create;
-    try
-      CategoryJSON.AddPair('name', Name);
-      CategoryJSON.AddPair('description', Description);
-      if Slug <> '' then
-        CategoryJSON.AddPair('slug', Slug);
-      if ParentID <> 0 then
-        CategoryJSON.AddPair('parent', TJSONNumber.Create(ParentID));
-
-      RestRequest.AddBody(CategoryJSON.ToString, ctAPPLICATION_JSON);
-    finally
-      CategoryJSON.Free;
-    end;
+    if not name.IsEmpty then
+      RestRequest.Params.AddItem('title', name, pkQUERY);
+    if not Description.IsEmpty then
+      RestRequest.Params.AddItem('description', Description, pkQUERY);
+    if not Slug.IsEmpty then
+      RestRequest.Params.AddItem('slug', Slug, pkQUERY);
+    if not ParentID >= 0 then
+      RestRequest.Params.AddItem('parent', ParentID.ToString, pkQUERY);
 
     RestRequest.Execute;
 
@@ -1086,7 +1096,6 @@ begin
   end;
 end;
 
-
 function TWordPressApi.DeleteCategory(const CategoryID: Integer): Boolean;
 var
   RestClient: TRESTClient;
@@ -1121,6 +1130,269 @@ begin
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
       Result := True;  // Category deleted successfully
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.CreateTag(const Name, Slug, Description: string): TWordPressTag;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST;
+    RestRequest.Resource := 'wp/v2/tags';
+
+    if not name.IsEmpty then
+      RestRequest.AddParameter('name', Name, pkQUERY);
+    if not Slug.IsEmpty then
+      RestRequest.AddParameter('slug', Slug, pkQUERY);
+    if Description.IsEmpty then
+      RestRequest.AddParameter('description', Description, pkQUERY);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 201 then  // HTTP 201 Created
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressTag.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Name := Name;
+        Result.Slug := Slug;
+        Result.Description := Description;
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.ListTags: TObjectList<TWordPressTag>;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONArray: TJSONArray;
+  I: Integer;
+  Tag: TWordPressTag;
+  JSONTag: TJSONObject;
+begin
+  Result := TObjectList<TWordPressTag>.Create;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/tags';
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONTag := JSONArray.Items[I] as TJSONObject;
+        Tag := TWordPressTag.Create;
+        Tag.ID := JSONTag.GetValue<Integer>('id');
+        Tag.Name := JSONTag.GetValue<string>('name');
+        Tag.Slug := JSONTag.GetValue<string>('slug');
+        Tag.Description := JSONTag.GetValue<string>('description');
+        // ... extract other fields as needed ...
+
+        Result.Add(Tag);
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.UpdateTag(const TagID: Integer; const Name, Slug, Description: string): TWordPressTag;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST;  // WordPress REST API often uses POST for updates
+    RestRequest.Resource := 'wp/v2/tags/{id}';
+    RestRequest.AddParameter('id', TagID.ToString, pkURLSEGMENT);
+
+    if not name.IsEmpty then
+      RestRequest.AddParameter('name', Name, pkQUERY);
+    if not Slug.IsEmpty then
+      RestRequest.AddParameter('slug', Slug, pkQUERY);
+    if Description.IsEmpty then
+      RestRequest.AddParameter('description', Description, pkQUERY);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressTag.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Name := Name;
+        Result.Slug := Slug;
+        Result.Description := Description;
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.RetrieveTag(const TagID: Integer): TWordPressTag;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONTag: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/tags/{id}';
+    RestRequest.AddParameter('id', TagID.ToString, pkURLSEGMENT);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONTag := JSONValue as TJSONObject;
+        Result := TWordPressTag.Create;
+        Result.ID := JSONTag.GetValue<Integer>('id');
+        Result.Name := JSONTag.GetValue<string>('name');
+        Result.Slug := JSONTag.GetValue<string>('slug');
+        Result.Description := JSONTag.GetValue<string>('description');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.DeleteTag(const TagID: Integer): Boolean;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+begin
+  Result := False;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmDELETE;
+    RestRequest.Resource := 'wp/v2/tags/{id}';
+    RestRequest.AddParameter('id', TagID.ToString, pkURLSEGMENT);
+
+    // Optional: Force delete, bypassing trash
+   // RestRequest.AddParameter('force', 'true', pkGETorPOST);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      Result := True;  // Tag deleted successfully
     end;
   finally
     RestRequest.Free;
