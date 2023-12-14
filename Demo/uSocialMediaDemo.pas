@@ -54,8 +54,34 @@ procedure TfrmSocialMainForm.btnDiscourseClick(Sender: TObject);
 var
   posts : TObjectList<TDiscoursePost>;
   categories : TObjectList<TDiscourseCategory>;
+  users : TObjectList<TDiscourseUser>;
+  groups : TObjectList<TDiscourseGroup>;
   I: Integer;
 begin
+  users := FDiscourse.GetUsers;
+  try
+    for I := 0 to users.Count - 1 do
+    begin
+      Memo1.Lines.Add(users[i].Id.ToString + ' ' + users[i].Username + ' ' + users[i].Name);
+    end;
+  finally
+    FreeAndNil(users);
+  end;
+
+
+  Memo1.Lines.Add('==== GROUPS ====');
+  groups := FDiscourse.GetGroups;
+  try
+    for I := 0 to groups.Count - 1 do
+    begin
+      Memo1.Lines.Add(groups[i].Id.ToString + ' ' + groups[i].Name);
+    end;
+  finally
+    FreeAndNil(groups);
+  end;
+
+
+  Memo1.Lines.Add('==== CATEGORIES ====');
   categories := FDiscourse.GetCategories;
   try
     for I := 0 to categories.Count - 1 do

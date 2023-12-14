@@ -42,6 +42,16 @@ type
     // Add more properties as per the JSON structure
   end;
 
+  TDiscourseGroup = class
+  private
+    FId: Integer;
+    FName: string;
+    // Add more fields as per the JSON structure
+  public
+    property Id: Integer read FId write FId;
+    property Name: string read FName write FName;
+    // Add more properties as per the JSON structure
+  end;
 
   TDiscourseUser = class
   public
@@ -67,6 +77,7 @@ type
     function GetTopics(Category: string): string;
     function GetUsers: TObjectList<TDiscourseUser>;
     function GetPosts: TObjectList<TDiscoursePost>;
+    function GetGroups: TObjectList<TDiscourseGroup>;
     // Add more methods for other API endpoints
   public
     function GetCategories: TObjectList<TDiscourseCategory>;
@@ -249,5 +260,46 @@ begin
     FreeAndNil(RESTRequest);
   end;
 end;
+
+function TDiscourseAPI.GetGroups: TObjectList<TDiscourseGroup>;
+var
+  RESTRequest: TRESTRequest;
+  JSONValue: TJSONValue;
+  JSONArray: TJSONArray;
+  JSONItem: TJSONValue;
+  Group: TDiscourseGroup;
+  I: Integer;
+begin
+  Result := TObjectList<TDiscourseGroup>.Create(True); // 'True' for owning the objects
+  RESTRequest := CreateRESTRequest;
+  try
+    RESTRequest.Resource := 'groups.json'; // Adjust this endpoint as necessary
+    RESTRequest.Execute;
+    JSONValue := RESTRequest.Response.JSONValue.GetValue<TJSONArray>('groups');
+    if JSONValue is TJSONArray then
+    begin
+      JSONArray := JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONItem := JSONArray.Items[I];
+        Group := TDiscourseGroup.Create;
+        try
+          Group.Id := JSONItem.GetValue<Integer>('id', 0);
+          Group.Name := JSONItem.GetValue<string>('name', '');
+          // Set other properties similarly
+          Result.Add(Group);
+        except
+          Group.Free;
+          raise;
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(RESTRequest.Response);
+    FreeAndNil(RESTRequest.Client);
+    FreeAndNil(RESTRequest);
+  end;
+end;
+
 
 end.
