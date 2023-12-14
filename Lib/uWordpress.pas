@@ -14,7 +14,17 @@ uses
   ;
 
 type
- TWordPressTag = class
+  TWordPressBlock = class
+    ID: Integer;
+    guid : string;
+    slug: string;
+    Title: string;
+    &Type: string;
+    Content: string;
+
+  end;
+
+  TWordPressTag = class
   public
     ID: Integer;
     Name: string;
@@ -117,6 +127,10 @@ type
     function ListTags: TObjectList<TWordPressTag>;
     function RetrieveTag(const TagID: Integer): TWordPressTag;
     function DeleteTag(const TagID: Integer): Boolean;
+  public
+    function ListBlocks: TObjectList<TWordPressBlock>;
+    function RetrieveBlock(const BlockID: Integer): TWordPressBlock;
+    function DeleteBlock(const BlockID: Integer): Boolean;
   end;
 
 implementation
@@ -129,7 +143,7 @@ uses
 constructor TWordPressApi.Create(const Endpoint, Username, Password: string);
 begin
   inherited Create;
-  FEndpoint := Endpoint;
+  FEndpoint := Endpoint + '/wp-json/';
   FUsername := Username;
   FPassword := Password;
 end;
@@ -1402,6 +1416,152 @@ begin
   end;
 end;
 
+function TWordPressApi.ListBlocks: TObjectList<TWordPressBlock>;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONArray: TJSONArray;
+  I: Integer;
+  Block: TWordPressBlock;
+  JSONBlock: TJSONObject;
+begin
+  Result := TObjectList<TWordPressBlock>.Create;
 
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/blocks'; // Replace 'blocks' with the actual endpoint for your blocks
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONBlock := JSONArray.Items[I] as TJSONObject;
+        Block := TWordPressBlock.Create;
+        // Extract fields from JSONBlock and assign them to Block's properties
+        Block.ID := JSONBlock.GetValue<Integer>('id');
+        Block.Title := JSONBlock.GetValue<String>('title.raw');
+        Block.Content := JSONBlock.GetValue<String>('content.raw');
+        Block.Slug := JSONBlock.GetValue<String>('slug');
+        Block.&Type := JSONBlock.GetValue<String>('type');
+        // ... extract other fields as needed ...
+
+        Result.Add(Block);
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+
+function TWordPressApi.RetrieveBlock(const BlockID: Integer): TWordPressBlock;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONBlock: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/blocks/{id}';  // Replace 'blocks' with the actual endpoint for your blocks
+    RestRequest.AddParameter('id', BlockID.ToString, pkURLSEGMENT);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONBlock := JSONValue as TJSONObject;
+        Result := TWordPressBlock.Create;
+        // Extract fields from JSONBlock and assign them to Result's properties
+        Result.ID := JSONBlock.GetValue<Integer>('id');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.DeleteBlock(const BlockID: Integer): Boolean;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+begin
+  Result := False;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmDELETE;
+    RestRequest.Resource := 'wp/v2/blocks/{id}';  // Replace 'blocks' with the actual endpoint for your blocks
+    RestRequest.AddParameter('id', BlockID.ToString, pkURLSEGMENT);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      Result := True;  // Block deleted successfully
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
 
 end.

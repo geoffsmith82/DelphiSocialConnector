@@ -114,6 +114,7 @@ end;
 
 procedure TfrmSocialMainForm.FormCreate(Sender: TObject);
 var
+  WordpressSiteURL : string;
   WordpressUsername : string;
   WordpressPassword : string;
   DiscourseBaseURL : string;
@@ -121,10 +122,11 @@ var
   DiscourseUsername : string;
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
+  WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
   WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
   WordpressPassword := FSettings.ReadString('Wordpress', 'Password', '');
 
-  FWp := TWordPressApi.Create('https://www.readabouttech.info/wp-json/', WordpressUsername, WordpressPassword);
+  FWp := TWordPressApi.Create(WordpressSiteURL, WordpressUsername, WordpressPassword);
 
   DiscourseUsername := FSettings.ReadString('Discourse', 'Username', '');
   DiscourseBaseURL := FSettings.ReadString('Discourse', 'BaseURL', '');
@@ -137,6 +139,7 @@ procedure TfrmSocialMainForm.btnWordpressClick(Sender: TObject);
 var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
+  blocks : TObjectList<TWordPressBlock>;
   mediaList : TObjectList<TWordPressMedia>;
   categories : TObjectList<TWordPressCategory>;
   i : Integer;
@@ -145,14 +148,14 @@ var
   mediaItem: TWordPressMedia;
   filename : string;
 begin
-//  FWp.CreatePost('Test Title', 'Test Content');
+  FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
   DeleteID := -1;
   posts := FWp.ListPosts('draft');
   try
     Memo1.Lines.Add('=== POSTS ===');
     for i := 0 to posts.Count - 1 do
     begin
-      Memo1.Lines.Add(posts[i].Title);
+      Memo1.Lines.Add(posts[i].ID.ToString + ' ' + posts[i].Title);
       if posts[i].Title = 'Test Title' then
       begin
         DeleteID := posts[i].ID;
@@ -169,11 +172,25 @@ begin
     Memo1.Lines.Add('=== PAGES ===');
     for i := 0 to pages.Count - 1 do
     begin
-      Memo1.Lines.Add(pages[i].Title);
+      Memo1.Lines.Add(pages[i].ID.ToString  + ' ' + pages[i].Title);
     end;
   finally
     FreeAndNil(pages);
   end;
+
+  blocks := FWp.ListBlocks;
+  try
+    Memo1.Lines.Add('=== BLOCKS ===');
+    for i := 0 to blocks.Count - 1 do
+    begin
+      Memo1.Lines.Add(blocks[i].ID.ToString  + ' ' + blocks[i].Title);
+      Memo1.Lines.Add(blocks[i].Content);
+    end;
+  finally
+    FreeAndNil(blocks);
+  end;
+
+
 
   categories := FWp.ListCategories;
   try
