@@ -21,17 +21,16 @@ uses
 type
   TfrmSocialMainForm = class(TForm)
     Memo1: TMemo;
-    Button1: TButton;
+    btnWordpress: TButton;
     btnTweet: TButton;
-    Button3: TButton;
-    Button2: TButton;
+    btnWebBrowser: TButton;
     btnDiscourse: TButton;
     procedure btnDiscourseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnWordpressClick(Sender: TObject);
     procedure btnTweetClick(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure btnWebBrowserClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TInifile;
@@ -54,8 +53,19 @@ uses uWebBrowswer;
 procedure TfrmSocialMainForm.btnDiscourseClick(Sender: TObject);
 var
   posts : TObjectList<TDiscoursePost>;
+  categories : TObjectList<TDiscourseCategory>;
   I: Integer;
 begin
+  categories := FDiscourse.GetCategories;
+  try
+    for I := 0 to categories.Count - 1 do
+    begin
+      Memo1.Lines.Add(categories[i].Id.ToString + ' ' + categories[i].Name);
+    end;
+  finally
+    FreeAndNil(categories);
+  end;
+
   posts := FDiscourse.GetPosts;
   try
     for I := 0 to posts.Count - 1 do
@@ -71,6 +81,8 @@ end;
 procedure TfrmSocialMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FWp);
+  FreeAndNil(FDiscourse);
+  FreeAndNil(FTwitter);
   FreeAndNil(FSettings);
 end;
 
@@ -95,7 +107,7 @@ begin
   FDiscourse := TDiscourseAPI.Create(DiscourseBaseURL, DiscourseAPIKey, DiscourseUsername);
 end;
 
-procedure TfrmSocialMainForm.Button1Click(Sender: TObject);
+procedure TfrmSocialMainForm.btnWordpressClick(Sender: TObject);
 var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
@@ -199,7 +211,7 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.Button2Click(Sender: TObject);
+procedure TfrmSocialMainForm.btnWebBrowserClick(Sender: TObject);
 begin
   Form1.ShowModal;
 end;

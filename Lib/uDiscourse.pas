@@ -110,7 +110,9 @@ begin
     RESTRequest.Execute;
     Result := RESTRequest.Response.Content;
   finally
-    RESTRequest.Free;
+    FreeAndNil(RESTRequest.Response);
+    FreeAndNil(RESTRequest.Client);
+    FreeAndNil(RESTRequest);
   end;
 end;
 
@@ -159,7 +161,9 @@ begin
 
     end;
   finally
-    RESTRequest.Free;
+    FreeAndNil(RESTRequest.Response);
+    FreeAndNil(RESTRequest.Client);
+    FreeAndNil(RESTRequest);
   end;
 end;
 
@@ -177,7 +181,7 @@ begin
   try
     RESTRequest.Resource := 'categories.json'; // Update this with the correct endpoint
     RESTRequest.Execute;
-    JSONValue := RESTRequest.Response.JSONValue;
+    JSONValue := RESTRequest.Response.JSONValue.GetValue<TJSONArray>('category_list.categories');
     if JSONValue is TJSONArray then
     begin
       JSONArray := JSONValue as TJSONArray;
@@ -197,7 +201,9 @@ begin
       end;
     end;
   finally
-    RESTRequest.Free;
+    FreeAndNil(RESTRequest.Response);
+    FreeAndNil(RESTRequest.Client);
+    FreeAndNil(RESTRequest);
   end;
 end;
 
@@ -238,7 +244,9 @@ begin
       end;
     end;
   finally
-    RESTRequest.Free;
+    FreeAndNil(RESTRequest.Response);
+    FreeAndNil(RESTRequest.Client);
+    FreeAndNil(RESTRequest);
   end;
 end;
 

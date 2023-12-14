@@ -22,17 +22,17 @@ object frmSocialMainForm: TfrmSocialMainForm
       'Memo1')
     TabOrder = 0
   end
-  object Button1: TButton
-    Left = 504
-    Top = 25
+  object btnWordpress: TButton
+    Left = 536
+    Top = 8
     Width = 75
     Height = 25
-    Caption = 'Button1'
+    Caption = 'Wordpress'
     TabOrder = 1
-    OnClick = Button1Click
+    OnClick = btnWordpressClick
   end
   object btnTweet: TButton
-    Left = 392
+    Left = 214
     Top = 8
     Width = 75
     Height = 25
@@ -40,21 +40,22 @@ object frmSocialMainForm: TfrmSocialMainForm
     TabOrder = 2
     OnClick = btnTweetClick
   end
-  object Button3: TButton
-    Left = 72
+  object btnWebBrowser: TButton
+    Left = 111
     Top = 8
     Width = 97
     Height = 25
-    Caption = 'Authenticate'
-    TabOrder = 3
-  end
-  object Button2: TButton
-    Left = 240
-    Top = 16
-    Width = 97
-    Height = 25
     Caption = 'Web Browser'
+    TabOrder = 3
+    OnClick = btnWebBrowserClick
+  end
+  object btnDiscourse: TButton
+    Left = 424
+    Top = 8
+    Width = 91
+    Height = 25
+    Caption = 'Discourse'
     TabOrder = 4
-    OnClick = Button2Click
+    OnClick = btnDiscourseClick
   end
 end
