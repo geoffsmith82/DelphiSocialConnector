@@ -13,6 +13,15 @@ uses
   ;
 
 type
+  TWordPressCategory = class
+  public
+    ID: Integer;
+    ParentID: Integer;
+    Name: string;
+    Slug: string;
+    Description: string;
+  end;
+
   TWordPressMedia = class
   public
     ID: Integer;
@@ -87,6 +96,11 @@ type
     function ListMedia: TObjectList<TWordPressMedia>;
     function RetrieveMedia(const MediaID: Integer): TWordPressMedia;
     function DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean = False): Boolean;
+  public
+    function CreateCategory(const Name, Description: string; const Slug: string = ''; const ParentID: Integer = 0): TWordPressCategory;
+    function RetrieveCategory(const CategoryID: Integer): TWordPressCategory;
+    function ListCategories: TObjectList<TWordPressCategory>;
+    function DeleteCategory(const CategoryID: Integer): Boolean;
   end;
 
 implementation
@@ -889,6 +903,224 @@ begin
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
       Result := True;  // Media deleted successfully
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.CreateCategory(const Name, Description: string; const Slug: string = ''; const ParentID: Integer = 0): TWordPressCategory;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  CategoryJSON: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST;
+    RestRequest.Resource := 'wp/v2/categories';
+
+    // Create JSON object with category details
+    CategoryJSON := TJSONObject.Create;
+    try
+      CategoryJSON.AddPair('name', Name);
+      CategoryJSON.AddPair('description', Description);
+      if Slug <> '' then
+        CategoryJSON.AddPair('slug', Slug);
+      if ParentID <> 0 then
+        CategoryJSON.AddPair('parent', TJSONNumber.Create(ParentID));
+
+      RestRequest.AddBody(CategoryJSON.ToString, ctAPPLICATION_JSON);
+    finally
+      CategoryJSON.Free;
+    end;
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 201 then  // HTTP 201 Created
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressCategory.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Name := Name;
+        Result.Description := Description;
+        Result.Slug := Slug;
+        if ParentID <> 0 then
+          Result.ParentID := ParentID;
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.ListCategories: TObjectList<TWordPressCategory>;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONArray: TJSONArray;
+  I: Integer;
+  Category: TWordPressCategory;
+  JSONCategory: TJSONObject;
+begin
+  Result := TObjectList<TWordPressCategory>.Create;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/categories';
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONArray := RestResponse.JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONCategory := JSONArray.Items[I] as TJSONObject;
+        Category := TWordPressCategory.Create;
+        Category.ID := JSONCategory.GetValue<Integer>('id');
+        Category.Name := JSONCategory.GetValue<string>('name');
+        Category.Slug := JSONCategory.GetValue<string>('slug');
+        Category.Description := JSONCategory.GetValue<string>('description');
+        // ... extract other fields as needed ...
+
+        Result.Add(Category);
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.RetrieveCategory(const CategoryID: Integer): TWordPressCategory;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONCategory: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/categories/{id}';
+    RestRequest.AddParameter('id', CategoryID.ToString, pkURLSEGMENT);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONCategory := JSONValue as TJSONObject;
+        Result := TWordPressCategory.Create;
+        Result.ID := JSONCategory.GetValue<Integer>('id');
+        Result.Name := JSONCategory.GetValue<string>('name');
+        Result.Slug := JSONCategory.GetValue<string>('slug');
+        Result.Description := JSONCategory.GetValue<string>('description');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+
+function TWordPressApi.DeleteCategory(const CategoryID: Integer): Boolean;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+begin
+  Result := False;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmDELETE;
+    RestRequest.Resource := 'wp/v2/categories/{id}';
+    RestRequest.AddParameter('id', CategoryID.ToString, pkURLSEGMENT);
+
+    // Optional: Force delete, bypassing trash
+    //RestRequest.AddParameter('force', 'true', pkGETorPOST);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      Result := True;  // Category deleted successfully
     end;
   finally
     RestRequest.Free;

@@ -70,6 +70,7 @@ var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
   mediaList : TObjectList<TWordPressMedia>;
+  categories : TObjectList<TWordPressCategory>;
   i : Integer;
   DeleteID : Integer;
   Settings : TStringList;
@@ -106,11 +107,27 @@ begin
     FreeAndNil(pages);
   end;
 
+  categories := FWp.ListCategories;
+  try
+    Memo1.Lines.Add('=== CATEGORY ===');
+    for i := 0 to categories.Count - 1 do
+    begin
+      Memo1.Lines.Add('ID=' + categories[i].ID.ToString + ' Name=' + categories[i].Name + ' Slug=' + categories[i].Slug + ' Description=' + categories[i].Description);
+    end;
+  finally
+    FreeAndNil(categories);
+  end;
+
+
   Memo1.Lines.Add('=== Media ===');
   filename := 'D:\ADUG\Symposium2023\advert.png';
   mediaItem := FWp.CreateMedia(filename, 'Test Image Upload');
-  FreeAndNil(mediaItem);
-  Memo1.Lines.Add('Uploaded MediaID: ' + mediaItem.ID.ToString);
+  try
+    Memo1.Lines.Add('Uploaded MediaID: ' + mediaItem.ID.ToString);
+  finally
+    FreeAndNil(mediaItem);
+  end;
+
 
   mediaList := FWp.ListMedia;
   try
