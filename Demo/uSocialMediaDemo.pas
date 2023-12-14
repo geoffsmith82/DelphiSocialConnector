@@ -147,6 +147,7 @@ var
   Settings : TStringList;
   mediaItem: TWordPressMedia;
   filename : string;
+  block : TWordPressBlock;
 begin
   FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
   DeleteID := -1;
@@ -189,6 +190,15 @@ begin
   finally
     FreeAndNil(blocks);
   end;
+
+  block := FWp.UpdateBlock(12, 'Updated Block', '''
+  <!-- wp:paragraph -->
+<p>This is an updated block</p>
+<!-- /wp:paragraph -->
+''' ,  'my-test-pattern-block', 'wp_block');
+  FreeAndNil(block);
+
+
 
 
 

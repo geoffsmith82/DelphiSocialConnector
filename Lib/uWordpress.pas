@@ -21,7 +21,6 @@ type
     Title: string;
     &Type: string;
     Content: string;
-
   end;
 
   TWordPressTag = class
@@ -128,6 +127,9 @@ type
     function RetrieveTag(const TagID: Integer): TWordPressTag;
     function DeleteTag(const TagID: Integer): Boolean;
   public
+    function CreateBlock(const Title, Content, Status: string): TWordPressBlock;
+    function UpdateBlock(const BlockID: Integer; const Title, Content, Slug,
+      BlockType: string): TWordPressBlock;
     function ListBlocks: TObjectList<TWordPressBlock>;
     function RetrieveBlock(const BlockID: Integer): TWordPressBlock;
     function DeleteBlock(const BlockID: Integer): Boolean;
@@ -1407,6 +1409,130 @@ begin
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
       Result := True;  // Tag deleted successfully
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.CreateBlock(const Title, Content, Status: string): TWordPressBlock;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  BlockJSON: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST;
+    RestRequest.Resource := 'wp/v2/blocks';  // Replace 'blocks' with the actual endpoint for your custom blocks
+
+    if not Title.IsEmpty then  
+      RestRequest.Params.AddItem('title', Title);
+    if not Content.IsEmpty then
+      RestRequest.Params.AddItem('content', Title);
+    if not Status.IsEmpty then
+      RestRequest.Params.AddItem('status', Status);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 201 then  // HTTP 201 Created
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressBlock.Create;
+        // Extract fields from the JSON response and assign them to Result's properties
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.UpdateBlock(const BlockID: Integer; const Title, Content, Slug, BlockType: string): TWordPressBlock;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  BlockJSON: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST; // or rmPUT, depending on your API
+    RestRequest.Resource := 'wp/v2/blocks/{id}';
+    RestRequest.AddParameter('id', BlockID.ToString, pkURLSEGMENT);
+
+    // Create JSON object with updated block details
+    BlockJSON := TJSONObject.Create;
+    try
+      if Title <> '' then
+        BlockJSON.AddPair('title', Title);
+      if Content <> '' then
+        BlockJSON.AddPair('content', Content);
+      if Slug <> '' then
+        BlockJSON.AddPair('slug', Slug);
+      if BlockType <> '' then
+        BlockJSON.AddPair('type', BlockType);
+
+      RestRequest.AddBody(BlockJSON.ToJSON, ctAPPLICATION_JSON);
+    finally
+      BlockJSON.Free;
+    end;
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressBlock.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Title := Title;
+        Result.Content := Content;
+        Result.Slug := Slug;
+        Result.&Type := BlockType;
+        // ... extract other fields as needed ...
+      end;
     end;
   finally
     RestRequest.Free;
