@@ -85,6 +85,7 @@ type
   public
     function CreateMedia(const FilePath: string;  const Title: string = ''): TWordPressMedia;
     function ListMedia: TObjectList<TWordPressMedia>;
+    function RetrieveMedia(const MediaID: Integer): TWordPressMedia;
     function DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean = False): Boolean;
   end;
 
@@ -194,13 +195,9 @@ begin
 
     if RestResponse.StatusCode = 201 then  // HTTP 201 Created
     begin
-      JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
-      try
-        if Assigned(JSONValue) and (JSONValue is TJSONObject) then
-          Result := True;  // Page created successfully
-      finally
-        JSONValue.Free;
-      end;
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+        Result := True;  // Page created successfully
     end;
   finally
     RestRequest.Free;
@@ -808,6 +805,56 @@ begin
   end;
 end;
 
+function TWordPressApi.RetrieveMedia(const MediaID: Integer): TWordPressMedia;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONMedia: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/media/{id}';
+    RestRequest.AddParameter('id', IntToStr(MediaID), pkURLSEGMENT);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONMedia := JSONValue as TJSONObject;
+        Result := TWordPressMedia.Create;
+        Result.ID := JSONMedia.GetValue<Integer>('id');
+        Result.Title := JSONMedia.GetValue<string>('title.rendered');
+        Result.URL := JSONMedia.GetValue<string>('source_url');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
 
 function TWordPressApi.DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean): Boolean;
 var
