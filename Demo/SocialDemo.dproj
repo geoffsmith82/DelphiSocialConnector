@@ -94,7 +94,7 @@
         <DCCReference Include="..\Lib\uTwitter.pas"/>
         <DCCReference Include="..\Lib\uWordpress.pas"/>
         <DCCReference Include="..\Lib\uDiscourse.pas"/>
-        <DCCReference Include="uWebBrowswer.pas">
+        <DCCReference Include="uWebBrowser.pas">
             <Form>Form1</Form>
             <FormType>dfm</FormType>
         </DCCReference>

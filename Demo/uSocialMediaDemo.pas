@@ -78,7 +78,7 @@ implementation
 
 {$R *.dfm}
 
-uses uWebBrowswer,
+uses uWebBrowser,
   uImageDisplayForm
   , uTwitterForm;
 

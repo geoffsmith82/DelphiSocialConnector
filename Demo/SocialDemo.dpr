@@ -20,7 +20,7 @@ uses
   uTwitter in '..\Lib\uTwitter.pas',
   uWordpress in '..\Lib\uWordpress.pas',
   uDiscourse in '..\Lib\uDiscourse.pas',
-  uWebBrowswer in 'uWebBrowswer.pas' {Form1},
+  uWebBrowser in 'uWebBrowser.pas' {Form1},
   uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay},
   uTwitterForm in 'uTwitterForm.pas' {FormTwitter};
 

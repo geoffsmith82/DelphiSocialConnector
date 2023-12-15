@@ -1,4 +1,4 @@
-unit uWebBrowswer;
+unit uWebBrowser;
 
 interface
 
