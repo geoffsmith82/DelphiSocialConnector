@@ -21,6 +21,7 @@ type
     Title: string;
     &Type: string;
     Content: string;
+    Status: string;
   end;
 
   TWordPressTag = class
@@ -98,11 +99,11 @@ type
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
     function CreatePost(const Title, Content: string): Boolean;
-    function ListPosts(status: string = 'publish'): TObjectList<TWordPressPost>;
+    function ListPosts(const status: string = 'publish'): TObjectList<TWordPressPost>;
     function DeletePost(const PostID: Integer): Boolean;
   public // Page functions
     function CreatePage(const Title, Content: string; const Status: string = 'draft'): Boolean;
-    function ListPages(status: string = 'publish'): TObjectList<TWordPressPage>;
+    function ListPages(const status: string = 'publish'): TObjectList<TWordPressPage>;
     function DeletePage(const PageID: Integer): Boolean;
   public  // User functions
     function CreateUser(const Username, Email, Password: string; const Role: string = 'subscriber'): Boolean;
@@ -129,8 +130,7 @@ type
     function DeleteTag(const TagID: Integer): Boolean;
   public
     function CreateBlock(const Title, Content, Status: string): TWordPressBlock;
-    function UpdateBlock(const BlockID: Integer; const Title, Content, Slug,
-      BlockType: string): TWordPressBlock;
+    function UpdateBlock(const BlockID: Integer; const Title, Content, Slug, BlockType: string): TWordPressBlock;
     function ListBlocks: TObjectList<TWordPressBlock>;
     function RetrieveBlock(const BlockID: Integer): TWordPressBlock;
     function DeleteBlock(const BlockID: Integer): Boolean;
@@ -409,7 +409,7 @@ begin
 end;
 
 
-function TWordPressApi.ListPosts(status: string = 'publish'): TObjectList<TWordPressPost>;
+function TWordPressApi.ListPosts(const status: string = 'publish'): TObjectList<TWordPressPost>;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -437,7 +437,8 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/posts';
-    RestRequest.Params.AddItem('status', status);
+    if not status.IsEmpty then
+      RestRequest.Params.AddItem('status', status);
 
     RestRequest.Execute;
 
@@ -571,7 +572,7 @@ begin
   end;
 end;
 
-function TWordPressApi.ListPages(status: string): TObjectList<TWordPressPage>;
+function TWordPressApi.ListPages(const status: string): TObjectList<TWordPressPage>;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -599,7 +600,8 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/pages';
-    RestRequest.Params.AddItem('status', status);
+    if not status.IsEmpty then
+      RestRequest.Params.AddItem('status', status);
 
     RestRequest.Execute;
 
@@ -1590,6 +1592,7 @@ begin
         Block.Content := JSONBlock.GetValue<String>('content.raw');
         Block.Slug := JSONBlock.GetValue<String>('slug');
         Block.&Type := JSONBlock.GetValue<String>('type');
+        Block.Status := JSONBlock.GetValue<String>('status');
         // ... extract other fields as needed ...
 
         Result.Add(Block);
@@ -1643,6 +1646,12 @@ begin
         Result := TWordPressBlock.Create;
         // Extract fields from JSONBlock and assign them to Result's properties
         Result.ID := JSONBlock.GetValue<Integer>('id');
+        Result.slug := JSONBlock.GetValue<string>('slug');
+        Result.Status := JSONBlock.GetValue<string>('status');
+        Result.&Type := JSONBlock.GetValue<string>('type');
+        Result.Title := JSONBlock.GetValue<string>('title.raw');
+        Result.guid := JSONBlock.GetValue<string>('guid');
+
         // ... extract other fields as needed ...
       end;
     end;

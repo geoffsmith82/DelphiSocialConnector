@@ -57,7 +57,7 @@ object frmSocialMainForm: TfrmSocialMainForm
     Top = 39
     Width = 625
     Height = 393
-    ActivePage = TsWpUsers
+    ActivePage = tsWpMedia
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 4
     object TabSheet1: TTabSheet
@@ -81,7 +81,7 @@ object frmSocialMainForm: TfrmSocialMainForm
         Left = 0
         Top = 0
         Width = 617
-        Height = 363
+        Height = 322
         Align = alClient
         Columns = <
           item
@@ -90,11 +90,38 @@ object frmSocialMainForm: TfrmSocialMainForm
           item
             Caption = 'Title'
             Width = 400
+          end
+          item
+            Caption = 'Status'
+            Width = 80
           end>
         HideSelection = False
+        ReadOnly = True
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
+        ExplicitHeight = 363
+      end
+      object Panel1: TPanel
+        Left = 0
+        Top = 322
+        Width = 617
+        Height = 41
+        Align = alBottom
+        Caption = 'Panel1'
+        TabOrder = 1
+        ExplicitLeft = 232
+        ExplicitTop = 232
+        ExplicitWidth = 185
+        object btnDeletePage: TButton
+          Left = 520
+          Top = 5
+          Width = 75
+          Height = 25
+          Caption = 'Delete Page'
+          TabOrder = 0
+          OnClick = btnDeletePageClick
+        end
       end
     end
     object Posts: TTabSheet
@@ -104,7 +131,7 @@ object frmSocialMainForm: TfrmSocialMainForm
         Left = 0
         Top = 0
         Width = 617
-        Height = 363
+        Height = 322
         Align = alClient
         Columns = <
           item
@@ -113,13 +140,40 @@ object frmSocialMainForm: TfrmSocialMainForm
           item
             Caption = 'Title'
             Width = 400
+          end
+          item
+            Caption = 'Status'
+            Width = 80
           end>
         DoubleBuffered = True
         HideSelection = False
+        ReadOnly = True
         RowSelect = True
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        ExplicitHeight = 363
+      end
+      object Panel3: TPanel
+        Left = 0
+        Top = 322
+        Width = 617
+        Height = 41
+        Align = alBottom
+        Caption = 'Panel3'
+        TabOrder = 1
+        ExplicitLeft = 264
+        ExplicitTop = 248
+        ExplicitWidth = 185
+        object btnDeletePost: TButton
+          Left = 528
+          Top = 6
+          Width = 75
+          Height = 25
+          Caption = 'Delete Post'
+          TabOrder = 0
+          OnClick = btnDeletePostClick
+        end
       end
     end
     object TabSheet2: TTabSheet
@@ -129,7 +183,7 @@ object frmSocialMainForm: TfrmSocialMainForm
         Left = 0
         Top = 0
         Width = 617
-        Height = 363
+        Height = 322
         Align = alClient
         Columns = <
           item
@@ -139,11 +193,39 @@ object frmSocialMainForm: TfrmSocialMainForm
           item
             Caption = 'Title'
             Width = 400
+          end
+          item
+            Caption = 'Status'
+            Width = 80
           end>
         DoubleBuffered = True
+        ReadOnly = True
+        RowSelect = True
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        ExplicitHeight = 363
+      end
+      object Panel2: TPanel
+        Left = 0
+        Top = 322
+        Width = 617
+        Height = 41
+        Align = alBottom
+        Caption = 'Panel2'
+        TabOrder = 1
+        ExplicitLeft = 272
+        ExplicitTop = 240
+        ExplicitWidth = 185
+        object btnDeleteBlock: TButton
+          Left = 528
+          Top = 6
+          Width = 75
+          Height = 25
+          Caption = 'Delete Block'
+          TabOrder = 0
+          OnClick = btnDeleteBlockClick
+        end
       end
     end
     object TsWpUsers: TTabSheet
@@ -153,7 +235,7 @@ object frmSocialMainForm: TfrmSocialMainForm
         Left = 0
         Top = 0
         Width = 617
-        Height = 363
+        Height = 322
         Align = alClient
         Columns = <
           item
@@ -170,10 +252,81 @@ object frmSocialMainForm: TfrmSocialMainForm
           end>
         DoubleBuffered = True
         HideSelection = False
+        ReadOnly = True
         RowSelect = True
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        ExplicitHeight = 363
+      end
+      object Panel4: TPanel
+        Left = 0
+        Top = 322
+        Width = 617
+        Height = 41
+        Align = alBottom
+        Caption = 'Panel4'
+        TabOrder = 1
+        ExplicitLeft = 320
+        ExplicitTop = 312
+        ExplicitWidth = 185
+        object btnDeleteUser: TButton
+          Left = 520
+          Top = 5
+          Width = 75
+          Height = 25
+          Caption = 'Delete User'
+          TabOrder = 0
+          OnClick = btnDeleteUserClick
+        end
+      end
+    end
+    object tsWpMedia: TTabSheet
+      Caption = 'Media'
+      ImageIndex = 5
+      object lvMedia: TListView
+        Left = 0
+        Top = 0
+        Width = 617
+        Height = 322
+        Align = alClient
+        Columns = <
+          item
+            Caption = 'MediaId'
+            Width = 80
+          end
+          item
+            Caption = 'Title'
+            Width = 400
+          end>
+        DoubleBuffered = True
+        HideSelection = False
+        ReadOnly = True
+        RowSelect = True
+        ParentDoubleBuffered = False
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
+      object Panel5: TPanel
+        Left = 0
+        Top = 322
+        Width = 617
+        Height = 41
+        Align = alBottom
+        Caption = 'Panel5'
+        TabOrder = 1
+        ExplicitLeft = 216
+        ExplicitTop = 160
+        ExplicitWidth = 185
+        object btnDeleteMedia: TButton
+          Left = 520
+          Top = 5
+          Width = 75
+          Height = 25
+          Caption = 'Delete Media'
+          TabOrder = 0
+          OnClick = btnDeleteMediaClick
+        end
       end
     end
   end

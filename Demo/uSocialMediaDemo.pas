@@ -14,6 +14,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.ComCtrls,
+  Vcl.ExtCtrls,
   uDiscourse,
   uWordpress,
   uTwitter
@@ -37,6 +38,23 @@ type
     lvBlocks: TListView;
     TsWpUsers: TTabSheet;
     lvUsers: TListView;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    btnDeletePage: TButton;
+    btnDeletePost: TButton;
+    btnDeleteBlock: TButton;
+    btnDeleteUser: TButton;
+    tsWpMedia: TTabSheet;
+    lvMedia: TListView;
+    Panel5: TPanel;
+    btnDeleteMedia: TButton;
+    procedure btnDeleteBlockClick(Sender: TObject);
+    procedure btnDeleteMediaClick(Sender: TObject);
+    procedure btnDeletePageClick(Sender: TObject);
+    procedure btnDeletePostClick(Sender: TObject);
+    procedure btnDeleteUserClick(Sender: TObject);
     procedure btnDiscourseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -61,6 +79,65 @@ implementation
 {$R *.dfm}
 
 uses uWebBrowswer;
+
+procedure TfrmSocialMainForm.btnDeleteBlockClick(Sender: TObject);
+var
+  BlockID : Integer;
+begin
+  if Assigned(lvBlocks.Selected) then
+  begin
+    BlockID := lvBlocks.Selected.Caption.ToInteger;
+    FWp.DeleteBlock(BlockID);
+    lvBlocks.Selected.Delete;
+  end;
+end;
+
+procedure TfrmSocialMainForm.btnDeleteMediaClick(Sender: TObject);
+var
+  MediaID : Integer;
+begin
+  if Assigned(lvMedia.Selected) then
+  begin
+    MediaID := lvMedia.Selected.Caption.ToInteger;
+    FWp.DeleteMedia(MediaID);
+    lvMedia.Selected.Delete;
+  end;
+end;
+
+procedure TfrmSocialMainForm.btnDeletePageClick(Sender: TObject);
+var
+  PageID : Integer;
+begin
+  if Assigned(lvPages.Selected) then
+  begin
+    PageID := lvPages.Selected.Caption.ToInteger;
+    FWp.DeletePage(PageID);
+    lvPages.Selected.Delete;
+  end;
+end;
+
+procedure TfrmSocialMainForm.btnDeletePostClick(Sender: TObject);
+var
+  PostID : Integer;
+begin
+  if Assigned(lvPosts.Selected) then
+  begin
+    PostID := lvPosts.Selected.Caption.ToInteger;
+    FWp.DeletePost(PostID);
+    lvPosts.Selected.Delete;
+  end;
+end;
+
+procedure TfrmSocialMainForm.btnDeleteUserClick(Sender: TObject);
+var
+  UserID : Integer;
+begin
+  if Assigned(lvUsers.Selected) then
+  begin
+    UserID := lvUsers.Selected.Caption.ToInteger;
+//    FWp.DeleteUser(UserID);
+  end;
+end;
 
 procedure TfrmSocialMainForm.btnDiscourseClick(Sender: TObject);
 var
@@ -156,7 +233,6 @@ var
   categories : TObjectList<TWordPressCategory>;
   users : TObjectList<TWordPressUser>;
   i : Integer;
-  DeleteID : Integer;
   Settings : TStringList;
   mediaItem: TWordPressMedia;
   filename : string;
@@ -165,10 +241,10 @@ var
   lvPageItem : TListItem;
   lvBlockItem : TListItem;
   lvUserItem : TListItem;
+  lvMediaItem : TListItem;
 begin
   FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
-  DeleteID := -1;
-  posts := FWp.ListPosts('draft');
+  posts := FWp.ListPosts;
   try
     Memo1.Lines.Add('=== POSTS ===');
     for i := 0 to posts.Count - 1 do
@@ -177,18 +253,13 @@ begin
       lvPostItem := lvPosts.Items.Add;
       lvPostItem.Caption := Posts[i].ID.ToString;
       lvPostItem.SubItems.Add(posts[i].Title);
-      if posts[i].Title = 'Test Title' then
-      begin
-        DeleteID := posts[i].ID;
-      end;
+      lvPostItem.SubItems.Add(posts[i].Status);
     end;
-
-    FWp.DeletePost(DeleteID);
   finally
     FreeAndNil(posts);
   end;
 
-  pages := FWp.ListPages('publish');
+  pages := FWp.ListPages('');
   try
     Memo1.Lines.Add('=== PAGES ===');
     for i := 0 to pages.Count - 1 do
@@ -196,6 +267,7 @@ begin
       lvPageItem := lvPages.Items.Add;
       lvPageItem.Caption := pages[i].ID.ToString;
       lvPageItem.SubItems.Add(pages[i].Title);
+      lvPageItem.SubItems.Add(pages[i].Status);
       Memo1.Lines.Add(pages[i].ID.ToString  + ' ' + pages[i].Title);
     end;
   finally
@@ -210,6 +282,7 @@ begin
       lvBlockItem := lvBlocks.Items.Add;
       lvBlockItem.Caption := blocks[i].ID.ToString;
       lvBlockItem.SubItems.Add(blocks[i].Title);
+      lvBlockItem.SubItems.Add(blocks[i].Status);
       Memo1.Lines.Add(blocks[i].ID.ToString  + ' ' + blocks[i].Title);
       Memo1.Lines.Add(blocks[i].Content);
     end;
@@ -266,9 +339,11 @@ begin
 
   mediaList := FWp.ListMedia;
   try
-
     for i := 0 to mediaList.Count - 1 do
     begin
+      lvMediaItem := lvMedia.Items.Add;
+      lvMediaItem.Caption := mediaList[i].ID.ToString;
+      lvMediaItem.SubItems.Add(mediaList[i].Title);
       Memo1.Lines.Add(mediaList[i].Title);
     end;
   finally
