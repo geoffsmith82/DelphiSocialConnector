@@ -20,7 +20,8 @@ uses
   uTwitter in '..\Lib\uTwitter.pas',
   uWordpress in '..\Lib\uWordpress.pas',
   uDiscourse in '..\Lib\uDiscourse.pas',
-  uWebBrowswer in 'uWebBrowswer.pas' {Form1};
+  uWebBrowswer in 'uWebBrowswer.pas' {Form1},
+  uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay};
 
 {$R *.res}
 
@@ -29,6 +30,7 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmSocialMainForm, frmSocialMainForm);
   Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TFormImageDisplay, FormImageDisplay);
   Application.Run;
 end.
 

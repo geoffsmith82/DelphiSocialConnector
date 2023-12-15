@@ -61,6 +61,7 @@ type
     procedure btnWordpressClick(Sender: TObject);
     procedure btnTweetClick(Sender: TObject);
     procedure btnWebBrowserClick(Sender: TObject);
+    procedure lvMediaDblClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TInifile;
@@ -78,7 +79,9 @@ implementation
 
 {$R *.dfm}
 
-uses uWebBrowswer;
+uses uWebBrowswer,
+  uImageDisplayForm
+  ;
 
 procedure TfrmSocialMainForm.btnDeleteBlockClick(Sender: TObject);
 var
@@ -244,7 +247,7 @@ var
   lvMediaItem : TListItem;
 begin
   FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
-  posts := FWp.ListPosts;
+  posts := FWp.ListPosts('');
   try
     Memo1.Lines.Add('=== POSTS ===');
     for i := 0 to posts.Count - 1 do
@@ -344,6 +347,7 @@ begin
       lvMediaItem := lvMedia.Items.Add;
       lvMediaItem.Caption := mediaList[i].ID.ToString;
       lvMediaItem.SubItems.Add(mediaList[i].Title);
+      lvMediaItem.SubItems.Add(mediaList[i].URL);
       Memo1.Lines.Add(mediaList[i].Title);
     end;
   finally
@@ -382,6 +386,14 @@ end;
 procedure TfrmSocialMainForm.btnWebBrowserClick(Sender: TObject);
 begin
   Form1.ShowModal;
+end;
+
+procedure TfrmSocialMainForm.lvMediaDblClick(Sender: TObject);
+begin
+  if Assigned(lvMedia.Selected) then
+  begin
+    FormImageDisplay.ShowImage(lvMedia.Selected.SubItems[1]);
+  end;
 end;
 
 end.

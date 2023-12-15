@@ -306,6 +306,7 @@ object frmSocialMainForm: TfrmSocialMainForm
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        OnDblClick = lvMediaDblClick
       end
       object Panel5: TPanel
         Left = 0

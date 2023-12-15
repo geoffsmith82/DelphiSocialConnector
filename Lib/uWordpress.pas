@@ -95,15 +95,17 @@ type
     FEndpoint: string;
     FUsername: string;
     FPassword: string;
+    function ListPosts(var posts: TObjectList<TWordPressPost>; const status: string = ''): Boolean; overload;
+    function ListPages(var pages: TObjectList<TWordPressPage>; const status: string = ''): Boolean; overload;
   public
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
     function CreatePost(const Title, Content: string): Boolean;
-    function ListPosts(const status: string = 'publish'): TObjectList<TWordPressPost>;
+    function ListPosts(const status: string = ''): TObjectList<TWordPressPost>; overload;
     function DeletePost(const PostID: Integer): Boolean;
   public // Page functions
     function CreatePage(const Title, Content: string; const Status: string = 'draft'): Boolean;
-    function ListPages(const status: string = 'publish'): TObjectList<TWordPressPage>;
+    function ListPages(const status: string = ''): TObjectList<TWordPressPage>; overload;
     function DeletePage(const PageID: Integer): Boolean;
   public  // User functions
     function CreateUser(const Username, Email, Password: string; const Role: string = 'subscriber'): Boolean;
@@ -409,7 +411,23 @@ begin
 end;
 
 
-function TWordPressApi.ListPosts(const status: string = 'publish'): TObjectList<TWordPressPost>;
+function TWordPressApi.ListPosts(const status: string = ''): TObjectList<TWordPressPost>;
+begin
+  Result := TObjectList<TWordPressPost>.Create;
+  if status.IsEmpty then
+  begin
+    ListPosts(Result, 'publish');
+    ListPosts(Result, 'future');
+    ListPosts(Result, 'draft');
+    ListPosts(Result, 'pending');
+    ListPosts(Result, 'private');
+  end
+  else
+    ListPosts(Result, status);
+end;
+
+
+function TWordPressApi.ListPosts(var posts: TObjectList<TWordPressPost>; const status: string = ''): Boolean;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -420,8 +438,7 @@ var
   I : Integer;
   Post : TWordPressPost;
 begin
-  Result := TObjectList<TWordPressPost>.Create;
-
+  Result := False;
   RestClient := nil;
   RestRequest := nil;
   RestResponse := nil;
@@ -460,8 +477,9 @@ begin
         Post.Excerpt := JSONPost.GetValue<string>('excerpt.rendered');
         // ... extract other fields as needed ...
 
-        Result.Add(Post);
+        Posts.Add(Post);
       end;
+      Result := True;
     end;
   finally
     RestRequest.Free;
@@ -572,7 +590,23 @@ begin
   end;
 end;
 
-function TWordPressApi.ListPages(const status: string): TObjectList<TWordPressPage>;
+function TWordPressApi.ListPages(const status: string = ''): TObjectList<TWordPressPage>;
+begin
+  Result := TObjectList<TWordPressPage>.Create;
+  if status.IsEmpty then
+  begin
+    ListPages(Result, 'publish');
+    ListPages(Result, 'future');
+    ListPages(Result, 'draft');
+    ListPages(Result, 'pending');
+    ListPages(Result, 'private');
+  end
+  else
+    ListPages(Result, status);
+end;
+
+
+function TWordPressApi.ListPages(var pages: TObjectList<TWordPressPage>; const status: string): Boolean;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -583,8 +617,7 @@ var
   I: Integer;
   Page: TWordPressPage;
 begin
-  Result := TObjectList<TWordPressPage>.Create;
-
+  Result := False;
   RestClient := nil;
   RestRequest := nil;
   RestResponse := nil;
@@ -623,8 +656,9 @@ begin
         Page.Excerpt := JSONPage.GetValue<string>('excerpt.rendered');
         // ... extract other fields as needed ...
 
-        Result.Add(Page);
+        Pages.Add(Page);
       end;
+      Result := True;
     end;
   finally
     RestRequest.Free;
