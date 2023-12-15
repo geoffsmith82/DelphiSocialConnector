@@ -13,6 +13,19 @@ uses
   ;
 
 type
+  TDiscourseTopic = class
+  private
+    FId: Integer;
+    FTitle: string;
+    FCreator: string;
+    // Add more fields as per the JSON structure
+  public
+    property Id: Integer read FId write FId;
+    property Title: string read FTitle write FTitle;
+    property Creator: string read FCreator write FCreator;
+    // Add more properties as per the JSON structure
+  end;
+
   TDiscoursePost = class
   private
     FId: Integer;
@@ -35,10 +48,12 @@ type
   private
     FId: Integer;
     FName: string;
+    FSlug: string;
     // Add more fields as per the JSON structure
   public
     property Id: Integer read FId write FId;
     property Name: string read FName write FName;
+    property Slug: string read FSlug write FSlug;
     // Add more properties as per the JSON structure
   end;
 
@@ -74,13 +89,13 @@ type
     function CreateRESTRequest: TRESTRequest;
   public
     constructor Create(const BaseURL, APIKey, Username: string);
-    function GetTopics(const Category: string): string;
     function GetUsers: TObjectList<TDiscourseUser>;
     function GetPosts: TObjectList<TDiscoursePost>;
     function GetGroups: TObjectList<TDiscourseGroup>;
     // Add more methods for other API endpoints
   public
     function GetCategories: TObjectList<TDiscourseCategory>;
+    function GetTopics(slug:string; id: Integer): TObjectList<TDiscourseTopic>;
   end;
 
 implementation
@@ -110,22 +125,49 @@ begin
   Result.Params.AddHeader('Api-Username', FUsername);
 end;
 
-function TDiscourseAPI.GetTopics(const Category: string): string;
+function TDiscourseAPI.GetTopics(slug:string; id: Integer): TObjectList<TDiscourseTopic>;
 var
   RESTRequest: TRESTRequest;
+  JSONValue: TJSONValue;
+  JSONArray: TJSONArray;
+  JSONItem: TJSONValue;
+  Topic: TDiscourseTopic;
+  I: Integer;
 begin
+  Result := TObjectList<TDiscourseTopic>.Create(True); // 'True' for owning the objects
   RESTRequest := CreateRESTRequest;
   try
-    RESTRequest.Resource := 'categories/{category}/topics.json';
-    RESTRequest.Params.AddUrlSegment('category', Category);
+    RESTRequest.Resource := '/c/{slug}/{id}.json'; // Update this with the correct endpoint for topics
+
+    RESTRequest.Params.AddUrlSegment('slug', slug);
+    RESTRequest.Params.AddUrlSegment('id', id.ToString);
+
     RESTRequest.Execute;
-    Result := RESTRequest.Response.Content;
+    JSONValue := RESTRequest.Response.JSONValue;
+    if JSONValue is TJSONArray then
+    begin
+      JSONArray := JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
+      begin
+        JSONItem := JSONArray.Items[I];
+        Topic := TDiscourseTopic.Create;
+        try
+          Topic.Id := JSONItem.GetValue<Integer>('id', 0);
+          Topic.Title := JSONItem.GetValue<string>('title', '');
+          Topic.Creator := JSONItem.GetValue<string>('creator', '');
+          // Set other properties similarly
+          Result.Add(Topic);
+        except
+          Topic.Free;
+          raise;
+        end;
+      end;
+    end;
   finally
-    FreeAndNil(RESTRequest.Response);
-    FreeAndNil(RESTRequest.Client);
-    FreeAndNil(RESTRequest);
+    RESTRequest.Free;
   end;
 end;
+
 
 function TDiscourseAPI.GetUsers: TObjectList<TDiscourseUser>;
 var
@@ -199,6 +241,7 @@ begin
         try
           Category.Id := JSONItem.GetValue<Integer>('id', 0);
           Category.Name := JSONItem.GetValue<string>('name', '');
+          Category.Slug := JSONItem.GetValue<string>('slug', '');
           // Set other properties similarly
           Result.Add(Category);
         except

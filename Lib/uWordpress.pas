@@ -1506,7 +1506,6 @@ var
   RestRequest: TRESTRequest;
   RestResponse: TRESTResponse;
   Authenticator: THTTPBasicAuthenticator;
-  BlockJSON: TJSONObject;
   JSONValue: TJSONValue;
 begin
   Result := nil;

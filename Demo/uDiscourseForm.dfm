@@ -111,11 +111,16 @@ object FormDiscourse: TFormDiscourse
           item
             Caption = 'Name'
             Width = 200
+          end
+          item
+            Caption = 'Slug'
+            Width = 200
           end>
         ReadOnly = True
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
+        OnDblClick = lvCategoryDblClick
       end
     end
   end

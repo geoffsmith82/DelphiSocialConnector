@@ -32,6 +32,7 @@ type
     lvCategory: TListView;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure lvCategoryDblClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -116,6 +117,7 @@ begin
       lvCategoryItem := lvCategory.Items.Add;
       lvCategoryItem.Caption := categories[i].Id.ToString;
       lvCategoryItem.SubItems.Add(categories[i].Name);
+      lvCategoryItem.SubItems.Add(categories[i].Slug);
       Memo1.Lines.Add(categories[i].Id.ToString + ' ' + categories[i].Name);
     end;
   finally
@@ -133,6 +135,19 @@ begin
     end;
   finally
     FreeAndNil(posts);
+  end;
+end;
+
+procedure TFormDiscourse.lvCategoryDblClick(Sender: TObject);
+var
+  slug : string;
+  id : Integer;
+begin
+  if Assigned(lvCategory.Selected) then
+  begin
+    id := lvCategory.Selected.Caption.ToInteger;
+    slug := lvCategory.Selected.SubItems[1];
+    FDiscourse.GetTopics(slug, id);
   end;
 end;
 
