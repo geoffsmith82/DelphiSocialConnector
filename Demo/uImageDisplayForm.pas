@@ -30,9 +30,6 @@ type
     procedure ShowImage(url: string);
   end;
 
-var
-  FormImageDisplay: TFormImageDisplay;
-
 implementation
 
 {$R *.dfm}

@@ -1,4 +1,4 @@
-unit uSocialMediaDemo;
+unit uWordpressForm;
 
 interface
 
@@ -20,11 +20,9 @@ uses
   ;
 
 type
-  TfrmSocialMainForm = class(TForm)
+  TFormWordpress = class(TForm)
     btnWordpress: TButton;
-    btnTweet: TButton;
     btnWebBrowser: TButton;
-    btnDiscourse: TButton;
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
     Pages: TTabSheet;
@@ -54,11 +52,9 @@ type
     procedure btnDeletePageClick(Sender: TObject);
     procedure btnDeletePostClick(Sender: TObject);
     procedure btnDeleteUserClick(Sender: TObject);
-    procedure btnDiscourseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnWordpressClick(Sender: TObject);
-    procedure btnTweetClick(Sender: TObject);
     procedure btnWebBrowserClick(Sender: TObject);
     procedure lvMediaDblClick(Sender: TObject);
   private
@@ -67,10 +63,11 @@ type
     FWp : TWordPressApi;
   public
     { Public declarations }
+    constructor Create(AOwner: TComponent; inSettings: TInifile); reintroduce;
   end;
 
 var
-  frmSocialMainForm: TfrmSocialMainForm;
+  FormWordpress: TFormWordpress;
 
 implementation
 
@@ -82,7 +79,7 @@ uses uWebBrowser,
   uDiscourseForm
   ;
 
-procedure TfrmSocialMainForm.btnDeleteBlockClick(Sender: TObject);
+procedure TFormWordpress.btnDeleteBlockClick(Sender: TObject);
 var
   BlockID : Integer;
 begin
@@ -94,7 +91,7 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.btnDeleteMediaClick(Sender: TObject);
+procedure TFormWordpress.btnDeleteMediaClick(Sender: TObject);
 var
   MediaID : Integer;
 begin
@@ -106,7 +103,7 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.btnDeletePageClick(Sender: TObject);
+procedure TFormWordpress.btnDeletePageClick(Sender: TObject);
 var
   PageID : Integer;
 begin
@@ -118,7 +115,7 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.btnDeletePostClick(Sender: TObject);
+procedure TFormWordpress.btnDeletePostClick(Sender: TObject);
 var
   PostID : Integer;
 begin
@@ -130,7 +127,7 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.btnDeleteUserClick(Sender: TObject);
+procedure TFormWordpress.btnDeleteUserClick(Sender: TObject);
 var
   UserID : Integer;
 begin
@@ -142,42 +139,25 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.btnDiscourseClick(Sender: TObject);
-var
-  FormDiscourse: TFormDiscourse;
-begin
-  FormDiscourse := TFormDiscourse.Create(nil, FSettings);
-  try
-    FormDiscourse.ShowModal;
-  finally
-    FreeAndNil(FormDiscourse);
-  end;
-
-end;
-
-procedure TfrmSocialMainForm.FormDestroy(Sender: TObject);
+procedure TFormWordpress.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FWp);
-  FreeAndNil(FSettings);
 end;
 
-procedure TfrmSocialMainForm.FormCreate(Sender: TObject);
+procedure TFormWordpress.FormCreate(Sender: TObject);
 var
   WordpressSiteURL : string;
   WordpressUsername : string;
   WordpressPassword : string;
 begin
-  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
   WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
   WordpressPassword := FSettings.ReadString('Wordpress', 'Password', '');
 
   FWp := TWordPressApi.Create(WordpressSiteURL, WordpressUsername, WordpressPassword);
-
-
 end;
 
-procedure TfrmSocialMainForm.btnWordpressClick(Sender: TObject);
+procedure TFormWordpress.btnWordpressClick(Sender: TObject);
 var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
@@ -313,28 +293,29 @@ begin
   end;
 end;
 
-procedure TfrmSocialMainForm.btnTweetClick(Sender: TObject);
-var
-  FormTwitter : TFormTwitter;
+constructor TFormWordpress.Create(AOwner: TComponent; inSettings: TInifile);
 begin
-  FormTwitter := TFormTwitter.Create(nil, FSettings);
-  try
-    FormTwitter.ShowModal;
-  finally
-    FreeAndNil(FormTwitter);
-  end;
+  inherited Create(AOwner);
+  FSettings := inSettings;
 end;
 
-procedure TfrmSocialMainForm.btnWebBrowserClick(Sender: TObject);
+procedure TFormWordpress.btnWebBrowserClick(Sender: TObject);
 begin
   Form1.ShowModal;
 end;
 
-procedure TfrmSocialMainForm.lvMediaDblClick(Sender: TObject);
+procedure TFormWordpress.lvMediaDblClick(Sender: TObject);
+var
+  FormImageDisplay: TFormImageDisplay;
 begin
   if Assigned(lvMedia.Selected) then
   begin
-    FormImageDisplay.ShowImage(lvMedia.Selected.SubItems[1]);
+    FormImageDisplay := TFormImageDisplay.Create(nil);
+    try
+      FormImageDisplay.ShowImage(lvMedia.Selected.SubItems[1]);
+    finally
+      FreeAndNil(FormImageDisplay);
+    end;
   end;
 end;
 

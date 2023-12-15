@@ -15,7 +15,7 @@ uses
   ExceptionLog7,
   {$ENDIF EurekaLog}
   Vcl.Forms,
-  uSocialMediaDemo in 'uSocialMediaDemo.pas' {frmSocialMainForm},
+  uWordpressForm in 'uWordpressForm.pas' {FormWordpress},
   uFacebook in '..\Lib\uFacebook.pas',
   uTwitter in '..\Lib\uTwitter.pas',
   uWordpress in '..\Lib\uWordpress.pas',
@@ -23,16 +23,15 @@ uses
   uWebBrowser in 'uWebBrowser.pas' {Form1},
   uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay},
   uTwitterForm in 'uTwitterForm.pas' {FormTwitter},
-  uDiscourseForm in 'uDiscourseForm.pas' {FormDiscourse};
+  uDiscourseForm in 'uDiscourseForm.pas' {FormDiscourse},
+  uMainForm in 'uMainForm.pas' {FormMain};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TfrmSocialMainForm, frmSocialMainForm);
-  Application.CreateForm(TForm1, Form1);
-  Application.CreateForm(TFormImageDisplay, FormImageDisplay);
+  Application.CreateForm(TFormMain, FormMain);
   Application.Run;
 end.
 

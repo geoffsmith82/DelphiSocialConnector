@@ -1,4 +1,4 @@
-object frmSocialMainForm: TfrmSocialMainForm
+object FormWordpress: TFormWordpress
   Left = 0
   Top = 0
   Caption = 'Social Media Demo'
@@ -25,32 +25,14 @@ object frmSocialMainForm: TfrmSocialMainForm
     TabOrder = 0
     OnClick = btnWordpressClick
   end
-  object btnTweet: TButton
-    Left = 214
-    Top = 8
-    Width = 75
-    Height = 25
-    Caption = 'Tweet'
-    TabOrder = 1
-    OnClick = btnTweetClick
-  end
   object btnWebBrowser: TButton
     Left = 111
     Top = 8
     Width = 97
     Height = 25
     Caption = 'Web Browser'
-    TabOrder = 2
+    TabOrder = 1
     OnClick = btnWebBrowserClick
-  end
-  object btnDiscourse: TButton
-    Left = 424
-    Top = 8
-    Width = 91
-    Height = 25
-    Caption = 'Discourse'
-    TabOrder = 3
-    OnClick = btnDiscourseClick
   end
   object PageControl1: TPageControl
     Left = -5
@@ -59,7 +41,7 @@ object frmSocialMainForm: TfrmSocialMainForm
     Height = 393
     ActivePage = Pages
     Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 4
+    TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Log'
       object Memo1: TMemo

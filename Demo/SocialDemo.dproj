@@ -87,8 +87,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="uSocialMediaDemo.pas">
-            <Form>frmSocialMainForm</Form>
+        <DCCReference Include="uWordpressForm.pas">
+            <Form>FormWordpress</Form>
         </DCCReference>
         <DCCReference Include="..\Lib\uFacebook.pas"/>
         <DCCReference Include="..\Lib\uTwitter.pas"/>
@@ -108,6 +108,10 @@
         </DCCReference>
         <DCCReference Include="uDiscourseForm.pas">
             <Form>FormDiscourse</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uMainForm.pas">
+            <Form>FormMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
