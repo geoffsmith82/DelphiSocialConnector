@@ -102,6 +102,10 @@
             <Form>FormImageDisplay</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uTwitterForm.pas">
+            <Form>FormTwitter</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

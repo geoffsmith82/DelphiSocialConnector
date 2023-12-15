@@ -21,7 +21,8 @@ uses
   uWordpress in '..\Lib\uWordpress.pas',
   uDiscourse in '..\Lib\uDiscourse.pas',
   uWebBrowswer in 'uWebBrowswer.pas' {Form1},
-  uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay};
+  uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay},
+  uTwitterForm in 'uTwitterForm.pas' {FormTwitter};
 
 {$R *.res}
 

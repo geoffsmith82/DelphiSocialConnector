@@ -16,8 +16,7 @@ uses
   Vcl.ComCtrls,
   Vcl.ExtCtrls,
   uDiscourse,
-  uWordpress,
-  uTwitter
+  uWordpress
   ;
 
 type
@@ -66,7 +65,7 @@ type
     { Private declarations }
     FSettings : TInifile;
     FWp : TWordPressApi;
-    FTwitter: TTwitterApi;
+
     FDiscourse: TDiscourseAPI;
   public
     { Public declarations }
@@ -81,7 +80,7 @@ implementation
 
 uses uWebBrowswer,
   uImageDisplayForm
-  ;
+  , uTwitterForm;
 
 procedure TfrmSocialMainForm.btnDeleteBlockClick(Sender: TObject);
 var
@@ -201,7 +200,6 @@ procedure TfrmSocialMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FWp);
   FreeAndNil(FDiscourse);
-  FreeAndNil(FTwitter);
   FreeAndNil(FSettings);
 end;
 
@@ -366,21 +364,13 @@ end;
 
 procedure TfrmSocialMainForm.btnTweetClick(Sender: TObject);
 var
-  TwitterAPIKey : string;
-  TwitterKeySecret : string;
-  TwitterAccessToken : string;
-  TwitterAccessTokenSecret : string;
+  FormTwitter : TFormTwitter;
 begin
-  TwitterAPIKey := FSettings.ReadString('Twitter', 'TwitterAPIKey', '');
-  TwitterKeySecret := FSettings.ReadString('Twitter', 'TwitterKeySecret', '');
-  TwitterAccessToken := FSettings.ReadString('Twitter', 'TwitterAccessToken', '');
-  TwitterAccessTokenSecret := FSettings.ReadString('Twitter', 'TwitterAccessTokenSecret', '');
-
-  FTwitter := TTwitterApi.Create(TwitterAPIKey, TwitterKeySecret, TwitterAccessToken, TwitterAccessTokenSecret);
+  FormTwitter := TFormTwitter.Create(nil, FSettings);
   try
-    FTwitter.PostTweet('Check out https://forums.adug.org.au/c/meetings/20 to find out next meetings');
+    FormTwitter.ShowModal;
   finally
-    FreeAndNil(FTwitter);
+    FreeAndNil(FormTwitter);
   end;
 end;
 
