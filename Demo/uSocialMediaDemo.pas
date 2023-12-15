@@ -13,6 +13,7 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  Vcl.ComCtrls,
   uDiscourse,
   uWordpress,
   uTwitter
@@ -20,11 +21,20 @@ uses
 
 type
   TfrmSocialMainForm = class(TForm)
-    Memo1: TMemo;
     btnWordpress: TButton;
     btnTweet: TButton;
     btnWebBrowser: TButton;
     btnDiscourse: TButton;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    Pages: TTabSheet;
+    Memo1: TMemo;
+    StatusBar1: TStatusBar;
+    Posts: TTabSheet;
+    lvPosts: TListView;
+    lvPages: TListView;
+    TabSheet2: TTabSheet;
+    lvBlocks: TListView;
     procedure btnDiscourseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -148,6 +158,9 @@ var
   mediaItem: TWordPressMedia;
   filename : string;
   block : TWordPressBlock;
+  lvPostItem : TListItem;
+  lvPageItem : TListItem;
+  lvBlockItem : TListItem;
 begin
   FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
   DeleteID := -1;
@@ -157,6 +170,9 @@ begin
     for i := 0 to posts.Count - 1 do
     begin
       Memo1.Lines.Add(posts[i].ID.ToString + ' ' + posts[i].Title);
+      lvPostItem := lvPosts.Items.Add;
+      lvPostItem.Caption := Posts[i].ID.ToString;
+      lvPostItem.SubItems.Add(posts[i].Title);
       if posts[i].Title = 'Test Title' then
       begin
         DeleteID := posts[i].ID;
@@ -173,6 +189,9 @@ begin
     Memo1.Lines.Add('=== PAGES ===');
     for i := 0 to pages.Count - 1 do
     begin
+      lvPageItem := lvPages.Items.Add;
+      lvPageItem.Caption := pages[i].ID.ToString;
+      lvPageItem.SubItems.Add(pages[i].Title);
       Memo1.Lines.Add(pages[i].ID.ToString  + ' ' + pages[i].Title);
     end;
   finally
@@ -184,6 +203,9 @@ begin
     Memo1.Lines.Add('=== BLOCKS ===');
     for i := 0 to blocks.Count - 1 do
     begin
+      lvBlockItem := lvBlocks.Items.Add;
+      lvBlockItem.Caption := blocks[i].ID.ToString;
+      lvBlockItem.SubItems.Add(blocks[i].Title);
       Memo1.Lines.Add(blocks[i].ID.ToString  + ' ' + blocks[i].Title);
       Memo1.Lines.Add(blocks[i].Content);
     end;
@@ -193,14 +215,13 @@ begin
 
   block := FWp.UpdateBlock(12, 'Updated Block', '''
   <!-- wp:paragraph -->
-<p>This is an updated block</p>
+<p>This block was updated at
+'''
++ ' ' + DateTimeToStr(now) + '''
+</p>
 <!-- /wp:paragraph -->
 ''' ,  'my-test-pattern-block', 'wp_block');
   FreeAndNil(block);
-
-
-
-
 
   categories := FWp.ListCategories;
   try
