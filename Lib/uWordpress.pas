@@ -1016,8 +1016,6 @@ begin
 
     RestRequest.Execute;
 
-
-
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
     begin
       Result := True;  // Media deleted successfully

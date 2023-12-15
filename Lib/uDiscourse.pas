@@ -73,8 +73,8 @@ type
     FUsername: string;
     function CreateRESTRequest: TRESTRequest;
   public
-    constructor Create(BaseURL, APIKey, Username: string);
-    function GetTopics(Category: string): string;
+    constructor Create(const BaseURL, APIKey, Username: string);
+    function GetTopics(const Category: string): string;
     function GetUsers: TObjectList<TDiscourseUser>;
     function GetPosts: TObjectList<TDiscoursePost>;
     function GetGroups: TObjectList<TDiscourseGroup>;
@@ -87,7 +87,7 @@ implementation
 
 { TDiscourseAPI }
 
-constructor TDiscourseAPI.Create(BaseURL, APIKey, Username: string);
+constructor TDiscourseAPI.Create(const BaseURL, APIKey, Username: string);
 begin
   inherited Create;
   FBaseURL := BaseURL;
@@ -110,7 +110,7 @@ begin
   Result.Params.AddHeader('Api-Username', FUsername);
 end;
 
-function TDiscourseAPI.GetTopics(Category: string): string;
+function TDiscourseAPI.GetTopics(const Category: string): string;
 var
   RESTRequest: TRESTRequest;
 begin
@@ -142,34 +142,30 @@ begin
     RESTRequest.Resource := 'admin/users/list/active.json';
     RESTRequest.Execute;
     JSONValue := RESTRequest.Response.JSONValue;
-    try
-      if JSONValue is TJSONArray then
+    if JSONValue is TJSONArray then
+    begin
+      JSONArray := JSONValue as TJSONArray;
+      for I := 0 to JSONArray.Count - 1 do
       begin
-        JSONArray := JSONValue as TJSONArray;
-        for I := 0 to JSONArray.Count - 1 do
-        begin
-          JSONItem := JSONArray.Items[I];
-          User := TDiscourseUser.Create;
-          try
-            User.Id := JSONItem.GetValue<Integer>('id', 0);
-            User.Username := JSONItem.GetValue<string>('username', '');
-            User.name := JSONItem.GetValue<string>('name', '');
-            User.Title := JSONItem.GetValue<string>('title', '');
-            User.Trust_Level := JSONItem.GetValue<Integer>('trust_level', 0);
-            User.Active := JSONItem.GetValue<Boolean>('active', False);
-            User.Admin := JSONItem.GetValue<Boolean>('admin', False);
-            User.Moderator := JSONItem.GetValue<Boolean>('moderator', False);
-            User.Staged := JSONItem.GetValue<Boolean>('staged', False);
-            // Set other properties similarly
-            Result.Add(User);
-          except
-            User.Free;
-            raise;
-          end;
+        JSONItem := JSONArray.Items[I];
+        User := TDiscourseUser.Create;
+        try
+          User.Id := JSONItem.GetValue<Integer>('id', 0);
+          User.Username := JSONItem.GetValue<string>('username', '');
+          User.name := JSONItem.GetValue<string>('name', '');
+          User.Title := JSONItem.GetValue<string>('title', '');
+          User.Trust_Level := JSONItem.GetValue<Integer>('trust_level', 0);
+          User.Active := JSONItem.GetValue<Boolean>('active', False);
+          User.Admin := JSONItem.GetValue<Boolean>('admin', False);
+          User.Moderator := JSONItem.GetValue<Boolean>('moderator', False);
+          User.Staged := JSONItem.GetValue<Boolean>('staged', False);
+          // Set other properties similarly
+          Result.Add(User);
+        except
+          User.Free;
+          raise;
         end;
       end;
-    finally
-
     end;
   finally
     FreeAndNil(RESTRequest.Response);

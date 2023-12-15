@@ -37,17 +37,17 @@ type
     lvBlocks: TListView;
     TsWpUsers: TTabSheet;
     lvUsers: TListView;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
-    Panel4: TPanel;
+    pnlPage: TPanel;
+    pnlBlock: TPanel;
+    pnlPosts: TPanel;
+    pnlUser: TPanel;
     btnDeletePage: TButton;
     btnDeletePost: TButton;
     btnDeleteBlock: TButton;
     btnDeleteUser: TButton;
     tsWpMedia: TTabSheet;
     lvMedia: TListView;
-    Panel5: TPanel;
+    pnlMedia: TPanel;
     btnDeleteMedia: TButton;
     procedure btnDeleteBlockClick(Sender: TObject);
     procedure btnDeleteMediaClick(Sender: TObject);
@@ -184,6 +184,8 @@ begin
     FreeAndNil(categories);
   end;
 
+
+  Memo1.Lines.Add('==== POSTS ====');
   posts := FDiscourse.GetPosts;
   try
     for I := 0 to posts.Count - 1 do

@@ -57,7 +57,7 @@ object frmSocialMainForm: TfrmSocialMainForm
     Top = 39
     Width = 625
     Height = 393
-    ActivePage = tsWpMedia
+    ActivePage = Pages
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 4
     object TabSheet1: TTabSheet
@@ -102,13 +102,12 @@ object frmSocialMainForm: TfrmSocialMainForm
         ViewStyle = vsReport
         ExplicitHeight = 363
       end
-      object Panel1: TPanel
+      object pnlPage: TPanel
         Left = 0
         Top = 322
         Width = 617
         Height = 41
         Align = alBottom
-        Caption = 'Panel1'
         TabOrder = 1
         ExplicitLeft = 232
         ExplicitTop = 232
@@ -154,13 +153,12 @@ object frmSocialMainForm: TfrmSocialMainForm
         ViewStyle = vsReport
         ExplicitHeight = 363
       end
-      object Panel3: TPanel
+      object pnlPosts: TPanel
         Left = 0
         Top = 322
         Width = 617
         Height = 41
         Align = alBottom
-        Caption = 'Panel3'
         TabOrder = 1
         ExplicitLeft = 264
         ExplicitTop = 248
@@ -206,13 +204,12 @@ object frmSocialMainForm: TfrmSocialMainForm
         ViewStyle = vsReport
         ExplicitHeight = 363
       end
-      object Panel2: TPanel
+      object pnlBlock: TPanel
         Left = 0
         Top = 322
         Width = 617
         Height = 41
         Align = alBottom
-        Caption = 'Panel2'
         TabOrder = 1
         ExplicitLeft = 272
         ExplicitTop = 240
@@ -259,13 +256,12 @@ object frmSocialMainForm: TfrmSocialMainForm
         ViewStyle = vsReport
         ExplicitHeight = 363
       end
-      object Panel4: TPanel
+      object pnlUser: TPanel
         Left = 0
         Top = 322
         Width = 617
         Height = 41
         Align = alBottom
-        Caption = 'Panel4'
         TabOrder = 1
         ExplicitLeft = 320
         ExplicitTop = 312
@@ -308,13 +304,12 @@ object frmSocialMainForm: TfrmSocialMainForm
         ViewStyle = vsReport
         OnDblClick = lvMediaDblClick
       end
-      object Panel5: TPanel
+      object pnlMedia: TPanel
         Left = 0
         Top = 322
         Width = 617
         Height = 41
         Align = alBottom
-        Caption = 'Panel5'
         TabOrder = 1
         ExplicitLeft = 216
         ExplicitTop = 160
