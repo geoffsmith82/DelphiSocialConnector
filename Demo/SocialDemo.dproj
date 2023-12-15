@@ -106,6 +106,10 @@
             <Form>FormTwitter</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uDiscourseForm.pas">
+            <Form>FormDiscourse</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

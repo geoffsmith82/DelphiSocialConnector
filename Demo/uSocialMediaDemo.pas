@@ -65,8 +65,6 @@ type
     { Private declarations }
     FSettings : TInifile;
     FWp : TWordPressApi;
-
-    FDiscourse: TDiscourseAPI;
   public
     { Public declarations }
   end;
@@ -79,8 +77,10 @@ implementation
 {$R *.dfm}
 
 uses uWebBrowser,
-  uImageDisplayForm
-  , uTwitterForm;
+  uImageDisplayForm,
+  uTwitterForm,
+  uDiscourseForm
+  ;
 
 procedure TfrmSocialMainForm.btnDeleteBlockClick(Sender: TObject);
 var
@@ -144,64 +144,20 @@ end;
 
 procedure TfrmSocialMainForm.btnDiscourseClick(Sender: TObject);
 var
-  posts : TObjectList<TDiscoursePost>;
-  categories : TObjectList<TDiscourseCategory>;
-  users : TObjectList<TDiscourseUser>;
-  groups : TObjectList<TDiscourseGroup>;
-  I: Integer;
+  FormDiscourse: TFormDiscourse;
 begin
-  users := FDiscourse.GetUsers;
+  FormDiscourse := TFormDiscourse.Create(nil, FSettings);
   try
-    for I := 0 to users.Count - 1 do
-    begin
-      Memo1.Lines.Add(users[i].Id.ToString + ' ' + users[i].Username + ' ' + users[i].Name);
-    end;
+    FormDiscourse.ShowModal;
   finally
-    FreeAndNil(users);
+    FreeAndNil(FormDiscourse);
   end;
 
-
-  Memo1.Lines.Add('==== GROUPS ====');
-  groups := FDiscourse.GetGroups;
-  try
-    for I := 0 to groups.Count - 1 do
-    begin
-      Memo1.Lines.Add(groups[i].Id.ToString + ' ' + groups[i].Name);
-    end;
-  finally
-    FreeAndNil(groups);
-  end;
-
-
-  Memo1.Lines.Add('==== CATEGORIES ====');
-  categories := FDiscourse.GetCategories;
-  try
-    for I := 0 to categories.Count - 1 do
-    begin
-      Memo1.Lines.Add(categories[i].Id.ToString + ' ' + categories[i].Name);
-    end;
-  finally
-    FreeAndNil(categories);
-  end;
-
-
-  Memo1.Lines.Add('==== POSTS ====');
-  posts := FDiscourse.GetPosts;
-  try
-    for I := 0 to posts.Count - 1 do
-    begin
-      Memo1.Lines.Add(posts[i].Id.ToString + ' ' + posts[i].Author);
-      Memo1.Lines.Add(posts[i].Content);
-    end;
-  finally
-    FreeAndNil(posts);
-  end;
 end;
 
 procedure TfrmSocialMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FWp);
-  FreeAndNil(FDiscourse);
   FreeAndNil(FSettings);
 end;
 
@@ -210,9 +166,6 @@ var
   WordpressSiteURL : string;
   WordpressUsername : string;
   WordpressPassword : string;
-  DiscourseBaseURL : string;
-  DiscourseAPIKey : string;
-  DiscourseUsername : string;
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
@@ -221,11 +174,7 @@ begin
 
   FWp := TWordPressApi.Create(WordpressSiteURL, WordpressUsername, WordpressPassword);
 
-  DiscourseUsername := FSettings.ReadString('Discourse', 'Username', '');
-  DiscourseBaseURL := FSettings.ReadString('Discourse', 'BaseURL', '');
-  DiscourseAPIKey := FSettings.ReadString('Discourse', 'APIKey', '');
 
-  FDiscourse := TDiscourseAPI.Create(DiscourseBaseURL, DiscourseAPIKey, DiscourseUsername);
 end;
 
 procedure TfrmSocialMainForm.btnWordpressClick(Sender: TObject);

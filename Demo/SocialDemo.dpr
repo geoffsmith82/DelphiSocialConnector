@@ -22,7 +22,8 @@ uses
   uDiscourse in '..\Lib\uDiscourse.pas',
   uWebBrowser in 'uWebBrowser.pas' {Form1},
   uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay},
-  uTwitterForm in 'uTwitterForm.pas' {FormTwitter};
+  uTwitterForm in 'uTwitterForm.pas' {FormTwitter},
+  uDiscourseForm in 'uDiscourseForm.pas' {FormDiscourse};
 
 {$R *.res}
 
