@@ -10,6 +10,7 @@ object FormDiscourse: TFormDiscourse
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15

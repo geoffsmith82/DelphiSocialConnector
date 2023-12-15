@@ -15,7 +15,6 @@ uses
   Vcl.StdCtrls,
   Vcl.ComCtrls,
   Vcl.ExtCtrls,
-  uDiscourse,
   uWordpress
   ;
 
@@ -74,9 +73,7 @@ implementation
 {$R *.dfm}
 
 uses uWebBrowser,
-  uImageDisplayForm,
-  uTwitterForm,
-  uDiscourseForm
+  uImageDisplayForm
   ;
 
 procedure TFormWordpress.btnDeleteBlockClick(Sender: TObject);

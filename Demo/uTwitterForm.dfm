@@ -11,6 +11,7 @@ object FormTwitter: TFormTwitter
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poScreenCenter
   TextHeight = 15
   object Image1: TImage
     Left = 8

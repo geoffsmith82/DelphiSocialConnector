@@ -11,6 +11,7 @@ object FormMain: TFormMain
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
@@ -48,5 +49,6 @@ object FormMain: TFormMain
     Height = 25
     Caption = 'Facebook'
     TabOrder = 3
+    OnClick = btnFacebookClick
   end
 end

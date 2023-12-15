@@ -59,6 +59,7 @@ begin
   FTwitter := TTwitterApi.Create(TwitterAPIKey, TwitterKeySecret, TwitterAccessToken, TwitterAccessTokenSecret);
   try
     FTwitter.PostTweet(mmoMessage.Text);
+    ShowMessage('Message Sent');
   finally
     FreeAndNil(FTwitter);
   end;

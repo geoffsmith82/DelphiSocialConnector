@@ -15,7 +15,8 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.ComCtrls,
-  uDiscourse, Vcl.StdCtrls
+  Vcl.StdCtrls,
+  uDiscourse
   ;
 
 type

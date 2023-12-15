@@ -24,6 +24,7 @@ uses
   uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay},
   uTwitterForm in 'uTwitterForm.pas' {FormTwitter},
   uDiscourseForm in 'uDiscourseForm.pas' {FormDiscourse},
+  uFacebookForm in 'uFacebookForm.pas' {FormFacebook},
   uMainForm in 'uMainForm.pas' {FormMain};
 
 {$R *.res}

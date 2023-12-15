@@ -16,7 +16,8 @@ uses
   Vcl.StdCtrls,
   uTwitterForm,
   uDiscourseForm,
-  uWordpressForm
+  uWordpressForm,
+  uFacebookForm
   ;
 
 type
@@ -28,6 +29,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnDiscourseClick(Sender: TObject);
+    procedure btnFacebookClick(Sender: TObject);
     procedure btnTwitterXClick(Sender: TObject);
     procedure btnWordpressClick(Sender: TObject);
   private
@@ -63,6 +65,18 @@ begin
     FormDiscourse.ShowModal;
   finally
     FreeAndNil(FormDiscourse);
+  end;
+end;
+
+procedure TFormMain.btnFacebookClick(Sender: TObject);
+var
+  FormFacebook: TFormFacebook;
+begin
+  FormFacebook := TFormFacebook.Create(nil, FSettings);
+  try
+    FormFacebook.ShowModal;
+  finally
+    FreeAndNil(FormFacebook);
   end;
 end;
 

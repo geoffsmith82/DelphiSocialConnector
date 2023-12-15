@@ -110,6 +110,10 @@
             <Form>FormDiscourse</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uFacebookForm.pas">
+            <Form>FormFacebook</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <DCCReference Include="uMainForm.pas">
             <Form>FormMain</Form>
             <FormType>dfm</FormType>
