@@ -111,14 +111,15 @@ type
     function CreateUser(const Username, Email, Password: string; const Role: string = 'subscriber'): Boolean;
     function ListUsers: TObjectList<TWordPressUser>;
     function RetrieveUser(const Username: string = 'me'): TWordPressUser;
-    function DeleteUser(const Username: string): Boolean;
+    function DeleteUser(const UserID: Integer): Boolean; overload;
+    function DeleteUser(const Username: string): Boolean; overload;
   public
     function GetSiteSettings: TStringList;
   public
     function CreateMedia(const FilePath: string;  const Title: string = ''): TWordPressMedia;
     function ListMedia: TObjectList<TWordPressMedia>;
     function RetrieveMedia(const MediaID: Integer): TWordPressMedia;
-    function DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean = False): Boolean;
+    function DeleteMedia(const MediaID: Integer): Boolean;
   public
     function CreateCategory(const Name, Description: string; const Slug: string = ''; const ParentID: Integer = 0): TWordPressCategory;
     function RetrieveCategory(const CategoryID: Integer): TWordPressCategory;
@@ -358,6 +359,50 @@ begin
         Result.Description := JSONUser.GetValue<string>('description');
         // ... extract other fields as needed ...
       end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.DeleteUser(const UserID: Integer): Boolean;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+begin
+  Result := False;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmDELETE;
+    RestRequest.Resource := 'wp/v2/users/{userid}';
+    RestRequest.AddParameter('userid', UserID.ToString, pkURLSEGMENT);
+
+    // Specify reassignment of posts
+    RestRequest.AddParameter('reassign', '1', pkGETorPOST);
+    RestRequest.AddParameter('force', 'true', pkGETorPOST);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      Result := True;  // User deleted successfully
     end;
   finally
     RestRequest.Free;
@@ -942,7 +987,7 @@ begin
   end;
 end;
 
-function TWordPressApi.DeleteMedia(const MediaID: Integer; const ForceDelete: Boolean): Boolean;
+function TWordPressApi.DeleteMedia(const MediaID: Integer): Boolean;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -967,8 +1012,7 @@ begin
     RestRequest.Method := rmDELETE;
     RestRequest.Resource := 'wp/v2/media/{id}';
     RestRequest.AddParameter('id', MediaID.ToString, pkURLSEGMENT);
-    if ForceDelete then
-      RestRequest.AddParameter('force', 'true', pkGETorPOST);
+    RestRequest.AddParameter('force', 'true', pkGETorPOST);
 
     RestRequest.Execute;
 

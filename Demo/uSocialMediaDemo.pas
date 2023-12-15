@@ -138,7 +138,8 @@ begin
   if Assigned(lvUsers.Selected) then
   begin
     UserID := lvUsers.Selected.Caption.ToInteger;
-//    FWp.DeleteUser(UserID);
+    FWp.DeleteUser(UserID);
+    lvUsers.Selected.Delete;
   end;
 end;
 
