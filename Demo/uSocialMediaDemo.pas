@@ -35,6 +35,8 @@ type
     lvPages: TListView;
     TabSheet2: TTabSheet;
     lvBlocks: TListView;
+    TsWpUsers: TTabSheet;
+    lvUsers: TListView;
     procedure btnDiscourseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -152,6 +154,7 @@ var
   blocks : TObjectList<TWordPressBlock>;
   mediaList : TObjectList<TWordPressMedia>;
   categories : TObjectList<TWordPressCategory>;
+  users : TObjectList<TWordPressUser>;
   i : Integer;
   DeleteID : Integer;
   Settings : TStringList;
@@ -161,6 +164,7 @@ var
   lvPostItem : TListItem;
   lvPageItem : TListItem;
   lvBlockItem : TListItem;
+  lvUserItem : TListItem;
 begin
   FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
   DeleteID := -1;
@@ -232,6 +236,21 @@ begin
     end;
   finally
     FreeAndNil(categories);
+  end;
+
+  users := FWp.ListUsers;
+  try
+    Memo1.Lines.Add('=== USER ===');
+    for i := 0 to users.Count - 1 do
+    begin
+      lvUserItem := lvUsers.Items.Add;
+      lvUserItem.Caption := users[i].ID.ToString;
+      lvUserItem.SubItems.Add(users[i].Username);
+      lvUserItem.SubItems.Add(users[i].Name);
+      Memo1.Lines.Add('ID=' + users[i].ID.ToString + ' Name=' + users[i].Name + ' Slug=' + users[i].Slug + ' Description=' + users[i].Description);
+    end;
+  finally
+    FreeAndNil(users);
   end;
 
 

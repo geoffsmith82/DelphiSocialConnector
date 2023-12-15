@@ -80,6 +80,7 @@ type
   TWordPressUser = class
     ID: Integer;
     Name: string;
+    Username: string;
     Slug: string;
     Email: string;
     URL: string;
@@ -539,6 +540,8 @@ begin
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/users';
 
+    RestRequest.Params.AddItem('context', 'edit');
+
     RestRequest.Execute;
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
@@ -550,6 +553,7 @@ begin
         User := TWordPressUser.Create;
         User.ID := JSONUser.GetValue<Integer>('id');
         User.Name := JSONUser.GetValue<string>('name');
+        User.Username := JSONUser.GetValue<string>('username');
         User.Slug := JSONUser.GetValue<string>('slug');
         User.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
         User.URL := JSONUser.GetValue<string>('url');
