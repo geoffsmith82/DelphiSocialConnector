@@ -130,6 +130,10 @@
             <Form>FormWordpressMedia</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uDiscourseTopicsForm.pas">
+            <Form>DiscourseTopicsForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

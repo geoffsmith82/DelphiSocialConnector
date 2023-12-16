@@ -28,7 +28,8 @@ uses
   uMainForm in 'uMainForm.pas' {FormMain},
   uWordpressEditorForm in 'uWordpressEditorForm.pas' {WordpressEditorForm},
   uWordpressUserForm in 'uWordpressUserForm.pas' {FormWordpressUser},
-  uWordpressMediaForm in 'uWordpressMediaForm.pas' {FormWordpressMedia};
+  uWordpressMediaForm in 'uWordpressMediaForm.pas' {FormWordpressMedia},
+  uDiscourseTopicsForm in 'uDiscourseTopicsForm.pas' {DiscourseTopicsForm};
 
 {$R *.res}
 

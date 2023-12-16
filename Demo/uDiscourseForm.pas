@@ -46,6 +46,8 @@ implementation
 
 {$R *.dfm}
 
+uses uDiscourseTopicsForm;
+
 { TFormDiscourse }
 
 constructor TFormDiscourse.Create(AOwner: TComponent; inSettings: TInifile);
@@ -140,14 +142,36 @@ end;
 
 procedure TFormDiscourse.lvCategoryDblClick(Sender: TObject);
 var
+  DiscourseTopicsForm: TDiscourseTopicsForm;
   slug : string;
   id : Integer;
+  topics : TObjectList<TDiscourseTopic>;
+  I: Integer;
+  lvTopic : TListItem;
 begin
   if Assigned(lvCategory.Selected) then
   begin
-    id := lvCategory.Selected.Caption.ToInteger;
-    slug := lvCategory.Selected.SubItems[1];
-    FDiscourse.GetTopics(slug, id);
+    DiscourseTopicsForm := TDiscourseTopicsForm.Create(nil);
+    try
+      id := lvCategory.Selected.Caption.ToInteger;
+      slug := lvCategory.Selected.SubItems[1];
+      topics := FDiscourse.GetTopics(slug, id);
+      try
+        for I := 0 to topics.Count - 1 do
+        begin
+          lvTopic := DiscourseTopicsForm.lvTopics.Items.Add;
+          lvTopic.Caption := topics[i].Id.ToString;
+          lvTopic.SubItems.Add(topics[i].Title);
+        end;
+
+        DiscourseTopicsForm.ShowModal;
+      finally
+        FreeAndNil(topics);
+      end;
+      DiscourseTopicsForm.lvTopics.Clear;
+    finally
+      FreeAndNil(DiscourseTopicsForm);
+    end;
   end;
 end;
 

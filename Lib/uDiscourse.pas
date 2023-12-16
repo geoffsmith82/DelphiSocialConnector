@@ -95,7 +95,7 @@ type
     // Add more methods for other API endpoints
   public
     function GetCategories: TObjectList<TDiscourseCategory>;
-    function GetTopics(slug:string; id: Integer): TObjectList<TDiscourseTopic>;
+    function GetTopics(const slug:string; id: Integer): TObjectList<TDiscourseTopic>;
   end;
 
 implementation
@@ -125,7 +125,7 @@ begin
   Result.Params.AddHeader('Api-Username', FUsername);
 end;
 
-function TDiscourseAPI.GetTopics(slug:string; id: Integer): TObjectList<TDiscourseTopic>;
+function TDiscourseAPI.GetTopics(const slug:string; id: Integer): TObjectList<TDiscourseTopic>;
 var
   RESTRequest: TRESTRequest;
   JSONValue: TJSONValue;
@@ -143,7 +143,7 @@ begin
     RESTRequest.Params.AddUrlSegment('id', id.ToString);
 
     RESTRequest.Execute;
-    JSONValue := RESTRequest.Response.JSONValue;
+    JSONValue := RESTRequest.Response.JSONValue.GetValue<TJSONArray>('topic_list.topics');
     if JSONValue is TJSONArray then
     begin
       JSONArray := JSONValue as TJSONArray;
