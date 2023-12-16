@@ -336,11 +336,33 @@ end;
 
 procedure TFormWordpress.btnAddMediaClick(Sender: TObject);
 var
+  mediaList : TObjectList<TWordPressMedia>;
   FormWordpressMedia : TFormWordpressMedia;
+  i : Integer;
+  lvMediaItem : TListItem;
 begin
   FormWordpressMedia := TFormWordpressMedia.Create(nil);
   try
     FormWordpressMedia.ShowModal;
+    if FormWordpressMedia.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.CreateMedia(FormWordpressMedia.edtFilename.Text, FormWordpressMedia.edtTitle.Text);
+      lvMedia.Items.Clear;
+      mediaList := FWp.ListMedia;
+      try
+        for i := 0 to mediaList.Count - 1 do
+        begin
+          lvMediaItem := lvMedia.Items.Add;
+          lvMediaItem.Caption := mediaList[i].ID.ToString;
+          lvMediaItem.SubItems.Add(mediaList[i].Title);
+          lvMediaItem.SubItems.Add(mediaList[i].URL);
+          Memo1.Lines.Add(mediaList[i].Title);
+        end;
+      finally
+        FreeAndNil(mediaList);
+      end;
+      ShowMessage('Media Item Created');
+    end;
   finally
     FreeAndNil(FormWordpressMedia);
   end;

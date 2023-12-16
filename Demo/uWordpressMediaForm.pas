@@ -20,7 +20,11 @@ type
     OpenDialog: TOpenDialog;
     btnAddMedia: TButton;
     btnCancel: TButton;
+    edtFilename: TEdit;
+    edtTitle: TEdit;
+    btnBrowse: TButton;
     procedure btnAddMediaClick(Sender: TObject);
+    procedure btnBrowseClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
@@ -36,6 +40,14 @@ procedure TFormWordpressMedia.btnAddMediaClick(Sender: TObject);
 begin
   ModalResult := Vcl.Controls.TModalResult(mbOK);
   Close;
+end;
+
+procedure TFormWordpressMedia.btnBrowseClick(Sender: TObject);
+begin
+  if OpenDialog.Execute then
+  begin
+    edtFilename.Text := OpenDialog.FileName;
+  end;
 end;
 
 procedure TFormWordpressMedia.btnCancelClick(Sender: TObject);

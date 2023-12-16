@@ -49,6 +49,7 @@ type
     URL: string;
     Description: string;
     MediaType: string;
+    Status: string;
   end;
 
   TWordPressPost = class
@@ -924,6 +925,7 @@ begin
         MediaItem.ID := JSONMedia.GetValue<Integer>('id');
         MediaItem.Title := JSONMedia.GetValue<string>('title.rendered');
         MediaItem.URL := JSONMedia.GetValue<string>('source_url');
+        MediaItem.Status := JSONMedia.GetValue<string>('status');
         // ... extract other fields as needed ...
 
         Result.Add(MediaItem);
@@ -977,6 +979,7 @@ begin
         Result.ID := JSONMedia.GetValue<Integer>('id');
         Result.Title := JSONMedia.GetValue<string>('title.rendered');
         Result.URL := JSONMedia.GetValue<string>('source_url');
+        Result.Status := JSONMedia.GetValue<string>('status');
         // ... extract other fields as needed ...
       end;
     end;
