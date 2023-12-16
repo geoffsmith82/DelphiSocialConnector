@@ -93,7 +93,7 @@ object FormWordpress: TFormWordpress
         end
         object btnAddPage: TButton
           Left = 432
-          Top = 6
+          Top = 5
           Width = 75
           Height = 25
           Caption = 'Add Page'

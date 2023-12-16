@@ -295,11 +295,33 @@ end;
 
 procedure TFormWordpress.btnAddPageClick(Sender: TObject);
 var
+  pages : TObjectList<TWordPressPage>;
   WordpressEditorForm: TWordpressEditorForm;
+  i : Integer;
+  lvPageItem : TListItem;
 begin
   WordpressEditorForm := TWordpressEditorForm.Create(nil);
   try
     WordpressEditorForm.ShowModal;
+    if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.CreatePage(WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, 'draft');
+      lvPages.Items.Clear;
+      pages := FWp.ListPages('');
+      try
+        Memo1.Lines.Add('=== PAGES ===');
+        for i := 0 to pages.Count - 1 do
+        begin
+          lvPageItem := lvPages.Items.Add;
+          lvPageItem.Caption := pages[i].ID.ToString;
+          lvPageItem.SubItems.Add(pages[i].Title);
+          lvPageItem.SubItems.Add(pages[i].Status);
+          Memo1.Lines.Add(pages[i].ID.ToString  + ' ' + pages[i].Title);
+        end;
+      finally
+        FreeAndNil(pages);
+      end;
+    end;
   finally
     FreeAndNil(WordpressEditorForm);
   end;

@@ -39,4 +39,11 @@ object WordpressEditorForm: TWordpressEditorForm
     TabOrder = 2
     OnClick = btnCancelClick
   end
+  object edtTitle: TEdit
+    Left = 8
+    Top = 19
+    Width = 593
+    Height = 23
+    TabOrder = 3
+  end
 end

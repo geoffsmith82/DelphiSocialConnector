@@ -232,11 +232,11 @@ begin
     // Create JSON object with page details
     PageJSON := TJSONObject.Create;
     try
-      PageJSON.AddPair('title', TJSONObject.Create.AddPair('rendered', Title));
-      PageJSON.AddPair('content', TJSONObject.Create.AddPair('rendered', Content));
+      PageJSON.AddPair('title', Title);
+      PageJSON.AddPair('content', Content);
       PageJSON.AddPair('status', Status);
 
-      RestRequest.AddBody(PageJSON.ToString, ctAPPLICATION_JSON);
+      RestRequest.AddBody(PageJSON.ToJSON, ctAPPLICATION_JSON);
     finally
       PageJSON.Free;
     end;

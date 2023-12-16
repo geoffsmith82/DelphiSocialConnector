@@ -20,6 +20,7 @@ type
     Memo1: TMemo;
     btnMakeWordpressPost: TButton;
     btnCancel: TButton;
+    edtTitle: TEdit;
     procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
@@ -33,6 +34,7 @@ implementation
 
 procedure TWordpressEditorForm.btnCancelClick(Sender: TObject);
 begin
+  ModalResult := Vcl.Controls.TModalResult(mbOK);
   Close;
 end;
 
