@@ -116,7 +116,9 @@ type
   public  // User functions
     function CreateUser(const Username, Email, Password: string; const Role: string = 'subscriber'): Boolean;
     function ListUsers: TObjectList<TWordPressUser>;
-    function RetrieveUser(const Username: string = 'me'): TWordPressUser;
+    function RetrieveUser(const Username: string = 'me'): TWordPressUser; overload;
+    function RetrieveUser(const UserID: Integer): TWordPressUser; overload;
+    function UpdateUser(const UserID: Integer; const Name, Email, UserName, Password: string): TWordPressUser;
     function DeleteUser(const UserID: Integer): Boolean; overload;
     function DeleteUser(const Username: string): Boolean; overload;
   public
@@ -602,6 +604,129 @@ begin
         Result := TWordPressUser.Create;
         Result.ID := JSONUser.GetValue<Integer>('id');
         Result.Name := JSONUser.GetValue<string>('name');
+        Result.Slug := JSONUser.GetValue<string>('slug');
+        Result.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
+        Result.URL := JSONUser.GetValue<string>('url');
+        Result.Description := JSONUser.GetValue<string>('description');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.UpdateUser(const UserID: Integer; const Name, Email, Username, Password: string): TWordPressUser;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  UserJSON: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST; // WordPress typically uses POST for updates
+    RestRequest.Resource := 'wp/v2/users/{id}';
+    RestRequest.AddParameter('id', IntToStr(UserID), pkURLSEGMENT);
+
+    // Create JSON object with updated user details
+    UserJSON := TJSONObject.Create;
+    try
+      if Name <> '' then
+        UserJSON.AddPair('name', Name);
+      if Email <> '' then
+        UserJSON.AddPair('email', Email);
+      if Password <> '' then
+        UserJSON.AddPair('password', Password);
+
+      RestRequest.AddBody(UserJSON.ToJSON, ctAPPLICATION_JSON);
+    finally
+      UserJSON.Free;
+    end;
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressUser.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Name := Name;
+        Result.Email := Email;
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+
+function TWordPressApi.RetrieveUser(const UserID: Integer): TWordPressUser;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONUser: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/users/{id}';
+    RestRequest.AddParameter('id', UserID.ToString, pkURLSEGMENT);
+
+    RestRequest.AddParameter('context', 'edit');
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONUser := JSONValue as TJSONObject;
+        Result := TWordPressUser.Create;
+        Result.ID := JSONUser.GetValue<Integer>('id');
+        Result.Name := JSONUser.GetValue<string>('name');
+        Result.Username := JSONUser.GetValue<string>('username');
         Result.Slug := JSONUser.GetValue<string>('slug');
         Result.Email := JSONUser.GetValue<string>('email', '');  // Email might not be always present
         Result.URL := JSONUser.GetValue<string>('url');

@@ -67,6 +67,7 @@ type
     procedure lvMediaDblClick(Sender: TObject);
     procedure lvPagesClick(Sender: TObject);
     procedure lvPostsDblClick(Sender: TObject);
+    procedure lvUsersDblClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TInifile;
@@ -573,6 +574,31 @@ begin
   finally
     FreeAndNil(WordpressEditorForm);
     FreeAndNil(post);
+  end;
+end;
+
+procedure TFormWordpress.lvUsersDblClick(Sender: TObject);
+var
+  WordpressUserForm : TFormWordpressUser;
+  UserId : Integer;
+  user : TWordPressUser;
+begin
+  WordpressUserForm := TFormWordpressUser.Create(nil);
+  try
+    UserId := lvUsers.Selected.Caption.ToInteger;
+    user := FWp.RetrieveUser(UserId);
+    WordpressUserForm.edtName.Text := user.Name;
+    WordpressUserForm.edtEmail.Text := user.Email;
+    WordpressUserForm.edtUsername.Text := user.Username;
+
+    WordpressUserForm.ShowModal;
+    if WordpressUserForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.UpdateUser(UserId, WordpressUserForm.edtName.Text, WordpressUserForm.edtEmail.Text, WordpressUserForm.edtUsername.Text, '');
+    end;
+  finally
+    FreeAndNil(WordpressUserForm);
+    FreeAndNil(user);
   end;
 end;
 

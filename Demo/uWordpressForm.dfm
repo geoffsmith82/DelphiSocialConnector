@@ -246,6 +246,7 @@ object FormWordpress: TFormWordpress
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        OnDblClick = lvUsersDblClick
       end
       object pnlUser: TPanel
         Left = 0
