@@ -27,7 +27,8 @@ uses
   uFacebookForm in 'uFacebookForm.pas' {FormFacebook},
   uMainForm in 'uMainForm.pas' {FormMain},
   uWordpressEditorForm in 'uWordpressEditorForm.pas' {WordpressEditorForm},
-  uWordpressUserForm in 'uWordpressUserForm.pas' {FormWordpressUser};
+  uWordpressUserForm in 'uWordpressUserForm.pas' {FormWordpressUser},
+  uWordpressMediaForm in 'uWordpressMediaForm.pas' {FormWordpressMedia};
 
 {$R *.res}
 
@@ -35,6 +36,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TFormWordpressMedia, FormWordpressMedia);
   Application.Run;
 end.
 

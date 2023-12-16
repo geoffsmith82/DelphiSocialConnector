@@ -31,7 +31,7 @@ object FormWordpress: TFormWordpress
     Top = 39
     Width = 625
     Height = 393
-    ActivePage = TabSheet2
+    ActivePage = tsWpMedia
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     object TabSheet1: TTabSheet
@@ -313,6 +313,15 @@ object FormWordpress: TFormWordpress
           Caption = 'Delete Media'
           TabOrder = 0
           OnClick = btnDeleteMediaClick
+        end
+        object btnAddMedia: TButton
+          Left = 432
+          Top = 5
+          Width = 75
+          Height = 25
+          Caption = 'Add Media'
+          TabOrder = 1
+          OnClick = btnAddMediaClick
         end
       end
     end

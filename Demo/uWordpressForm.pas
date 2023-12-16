@@ -15,8 +15,7 @@ uses
   Vcl.StdCtrls,
   Vcl.ComCtrls,
   Vcl.ExtCtrls,
-  uWordpress,
-  uWordpressEditorForm
+  uWordpress
   ;
 
 type
@@ -50,7 +49,9 @@ type
     btnAddPost: TButton;
     btnAddBlock: TButton;
     btnAddUser: TButton;
+    btnAddMedia: TButton;
     procedure btnAddBlockClick(Sender: TObject);
+    procedure btnAddMediaClick(Sender: TObject);
     procedure btnAddPageClick(Sender: TObject);
     procedure btnDeleteBlockClick(Sender: TObject);
     procedure btnDeleteMediaClick(Sender: TObject);
@@ -72,16 +73,15 @@ type
     constructor Create(AOwner: TComponent; inSettings: TInifile); reintroduce;
   end;
 
-var
-  FormWordpress: TFormWordpress;
-
 implementation
 
 {$R *.dfm}
 
 uses uWebBrowser,
   uImageDisplayForm,
-  uWordpressUserForm
+  uWordpressUserForm,
+  uWordpressEditorForm,
+  uWordpressMediaForm
   ;
 
 procedure TFormWordpress.btnDeleteBlockClick(Sender: TObject);
@@ -334,6 +334,18 @@ begin
   end;
 end;
 
+procedure TFormWordpress.btnAddMediaClick(Sender: TObject);
+var
+  FormWordpressMedia : TFormWordpressMedia;
+begin
+  FormWordpressMedia := TFormWordpressMedia.Create(nil);
+  try
+    FormWordpressMedia.ShowModal;
+  finally
+    FreeAndNil(FormWordpressMedia);
+  end;
+end;
+
 procedure TFormWordpress.btnAddPageClick(Sender: TObject);
 var
   pages : TObjectList<TWordPressPage>;
@@ -429,7 +441,7 @@ begin
     if FormWordpressUser.ModalResult = Vcl.Controls.TModalResult(mbOK) then
     begin
       FWp.CreateUser(FormWordpressUser.edtUsername.Text, FormWordpressUser.edtEmail.Text, FormWordpressUser.edtPassword.Text);
-      lvPages.Items.Clear;
+      lvUsers.Items.Clear;
       users := FWp.ListUsers;
       try
         Memo1.Lines.Add('=== USERS ===');
