@@ -1,4 +1,4 @@
-unit uWordpressEditorForm;
+unit uWordpressUserForm;
 
 interface
 
@@ -16,13 +16,19 @@ uses
   ;
 
 type
-  TWordpressEditorForm = class(TForm)
-    Memo1: TMemo;
-    btnMakeWordpressPost: TButton;
+  TFormWordpressUser = class(TForm)
+    lblUsername: TLabel;
+    lblName: TLabel;
+    lblEmail: TLabel;
+    edtUsername: TEdit;
+    edtName: TEdit;
+    edtEmail: TEdit;
+    btnOK: TButton;
     btnCancel: TButton;
-    edtTitle: TEdit;
+    lblPassword: TLabel;
+    edtPassword: TEdit;
     procedure btnCancelClick(Sender: TObject);
-    procedure btnMakeWordpressPostClick(Sender: TObject);
+    procedure btnOKClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -33,13 +39,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TWordpressEditorForm.btnCancelClick(Sender: TObject);
+procedure TFormWordpressUser.btnCancelClick(Sender: TObject);
 begin
   ModalResult := Vcl.Controls.TModalResult(mbCancel);
   Close;
 end;
 
-procedure TWordpressEditorForm.btnMakeWordpressPostClick(Sender: TObject);
+procedure TFormWordpressUser.btnOKClick(Sender: TObject);
 begin
   ModalResult := Vcl.Controls.TModalResult(mbOK);
   Close;

@@ -26,7 +26,8 @@ uses
   uDiscourseForm in 'uDiscourseForm.pas' {FormDiscourse},
   uFacebookForm in 'uFacebookForm.pas' {FormFacebook},
   uMainForm in 'uMainForm.pas' {FormMain},
-  uWordpressEditorForm in 'uWordpressEditorForm.pas' {WordpressEditorForm};
+  uWordpressEditorForm in 'uWordpressEditorForm.pas' {WordpressEditorForm},
+  uWordpressUserForm in 'uWordpressUserForm.pas' {FormWordpressUser};
 
 {$R *.res}
 

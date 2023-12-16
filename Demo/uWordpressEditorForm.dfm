@@ -28,6 +28,7 @@ object WordpressEditorForm: TWordpressEditorForm
     Caption = 'Make Wordpress Post'
     Default = True
     TabOrder = 1
+    OnClick = btnMakeWordpressPostClick
   end
   object btnCancel: TButton
     Left = 384

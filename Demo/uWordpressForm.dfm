@@ -260,6 +260,15 @@ object FormWordpress: TFormWordpress
           TabOrder = 0
           OnClick = btnDeleteUserClick
         end
+        object btnAddUser: TButton
+          Left = 432
+          Top = 5
+          Width = 75
+          Height = 25
+          Caption = 'Add User'
+          TabOrder = 1
+          OnClick = btnAddUserClick
+        end
       end
     end
     object tsWpMedia: TTabSheet

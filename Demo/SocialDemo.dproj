@@ -122,6 +122,10 @@
             <Form>WordpressEditorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uWordpressUserForm.pas">
+            <Form>FormWordpressUser</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

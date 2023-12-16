@@ -49,6 +49,7 @@ type
     btnAddPage: TButton;
     btnAddPost: TButton;
     btnAddBlock: TButton;
+    btnAddUser: TButton;
     procedure btnAddBlockClick(Sender: TObject);
     procedure btnAddPageClick(Sender: TObject);
     procedure btnDeleteBlockClick(Sender: TObject);
@@ -60,6 +61,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnWebBrowserClick(Sender: TObject);
     procedure btnAddPostClick(Sender: TObject);
+    procedure btnAddUserClick(Sender: TObject);
     procedure lvMediaDblClick(Sender: TObject);
   private
     { Private declarations }
@@ -78,7 +80,8 @@ implementation
 {$R *.dfm}
 
 uses uWebBrowser,
-  uImageDisplayForm
+  uImageDisplayForm,
+  uWordpressUserForm
   ;
 
 procedure TFormWordpress.btnDeleteBlockClick(Sender: TObject);
@@ -414,6 +417,42 @@ begin
     end;
   finally
     FreeAndNil(WordpressEditorForm);
+  end;
+end;
+
+procedure TFormWordpress.btnAddUserClick(Sender: TObject);
+var
+  FormWordpressUser: TFormWordpressUser;
+  users : TObjectList<TWordPressUser>;
+  i : Integer;
+  lvUserItem : TListItem;
+begin
+  FormWordpressUser := TFormWordpressUser.Create(nil);
+  try
+    FormWordpressUser.ShowModal;
+    if FormWordpressUser.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.CreateUser(FormWordpressUser.edtUsername.Text, FormWordpressUser.edtEmail.Text, FormWordpressUser.edtPassword.Text);
+      lvPages.Items.Clear;
+      users := FWp.ListUsers;
+      try
+        Memo1.Lines.Add('=== USERS ===');
+        for i := 0 to users.Count - 1 do
+        begin
+          lvUserItem := LvUsers.Items.Add;
+          lvUserItem.Caption := users[i].ID.ToString;
+          lvUserItem.SubItems.Add(users[i].Username);
+          lvUserItem.SubItems.Add(users[i].Name);
+          Memo1.Lines.Add(users[i].ID.ToString  + ' ' + users[i].Username + ' ' + users[i].Name);
+        end;
+      finally
+        FreeAndNil(users);
+      end;
+      Close;
+      ShowMessage('User Created');
+    end;
+  finally
+    FreeAndNil(FormWordpressUser);
   end;
 end;
 
