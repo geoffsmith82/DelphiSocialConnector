@@ -48,6 +48,8 @@ type
     btnDeleteMedia: TButton;
     btnAddPage: TButton;
     btnAddPost: TButton;
+    btnAddBlock: TButton;
+    procedure btnAddBlockClick(Sender: TObject);
     procedure btnAddPageClick(Sender: TObject);
     procedure btnDeleteBlockClick(Sender: TObject);
     procedure btnDeleteMediaClick(Sender: TObject);
@@ -293,6 +295,42 @@ constructor TFormWordpress.Create(AOwner: TComponent; inSettings: TInifile);
 begin
   inherited Create(AOwner);
   FSettings := inSettings;
+end;
+
+procedure TFormWordpress.btnAddBlockClick(Sender: TObject);
+var
+  blocks : TObjectList<TWordPressBlock>;
+  WordpressEditorForm: TWordpressEditorForm;
+  i : Integer;
+  lvBlockItem : TListItem;
+begin
+  WordpressEditorForm := TWordpressEditorForm.Create(nil);
+  try
+    WordpressEditorForm.ShowModal;
+    if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.CreateBlock(WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, 'draft');
+      lvBlocks.Items.Clear;
+      blocks := FWp.ListBlocks;
+      try
+        Memo1.Lines.Add('=== BLOCKS ===');
+        for i := 0 to blocks.Count - 1 do
+        begin
+          lvBlockItem := lvBlocks.Items.Add;
+          lvBlockItem.Caption := blocks[i].ID.ToString;
+          lvBlockItem.SubItems.Add(blocks[i].Title);
+          lvBlockItem.SubItems.Add(blocks[i].Status);
+          Memo1.Lines.Add(blocks[i].ID.ToString  + ' ' + blocks[i].Title);
+        end;
+      finally
+        FreeAndNil(blocks);
+      end;
+      Close;
+      ShowMessage('Block Created');
+    end;
+  finally
+    FreeAndNil(WordpressEditorForm);
+  end;
 end;
 
 procedure TFormWordpress.btnAddPageClick(Sender: TObject);

@@ -31,7 +31,7 @@ object FormWordpress: TFormWordpress
     Top = 39
     Width = 625
     Height = 393
-    ActivePage = Posts
+    ActivePage = TabSheet2
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     object TabSheet1: TTabSheet
@@ -202,6 +202,15 @@ object FormWordpress: TFormWordpress
           Caption = 'Delete Block'
           TabOrder = 0
           OnClick = btnDeleteBlockClick
+        end
+        object btnAddBlock: TButton
+          Left = 447
+          Top = 6
+          Width = 75
+          Height = 25
+          Caption = 'Add Block'
+          TabOrder = 1
+          OnClick = btnAddBlockClick
         end
       end
     end
