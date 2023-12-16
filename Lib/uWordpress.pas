@@ -103,6 +103,8 @@ type
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
     function CreatePost(const Title, Content: string; const Status: string = 'draft'): Boolean;
+    function RetrievePost(const PostID: Integer): TWordPressPost;
+    function UpdatePost(const PostID: Integer; const Title, Content, Status: string): TWordPressPost;
     function ListPosts(const status: string = ''): TObjectList<TWordPressPost>; overload;
     function DeletePost(const PostID: Integer): Boolean;
   public // Page functions
@@ -205,6 +207,128 @@ begin
     Authenticator.Free;
   end;
 end;
+
+function TWordPressApi.RetrievePost(const PostID: Integer): TWordPressPost;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONPost: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/posts/{id}';
+    RestRequest.AddParameter('id', PostID.ToString, pkURLSEGMENT);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONPost := JSONValue as TJSONObject;
+        Result := TWordPressPost.Create;
+        Result.ID := JSONPost.GetValue<Integer>('id');
+        Result.Title := JSONPost.GetValue<string>('title.raw');
+        Result.Content := JSONPost.GetValue<string>('content.raw');
+        Result.Slug := JSONPost.GetValue<string>('slug');
+        Result.Status := JSONPost.GetValue<string>('status');
+        Result.&Type := JSONPost.GetValue<string>('type');
+        Result.Date := ISO8601ToDate(JSONPost.GetValue<string>('date'));
+        Result.Author := JSONPost.GetValue<Integer>('author');
+        Result.Excerpt := JSONPost.GetValue<string>('excerpt.raw');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+function TWordPressApi.UpdatePost(const PostID: Integer; const Title, Content, Status: string): TWordPressPost;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  PostJSON: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST; // WordPress typically uses POST for updates
+    RestRequest.Resource := 'wp/v2/posts/{id}';
+    RestRequest.AddParameter('id', PostID.ToString, pkURLSEGMENT);
+
+    // Create JSON object with updated post details
+    PostJSON := TJSONObject.Create;
+    try
+      PostJSON.AddPair('title', Title);
+      PostJSON.AddPair('content', Content);
+      PostJSON.AddPair('status', Status);
+
+      RestRequest.AddBody(PostJSON.ToString, ctAPPLICATION_JSON);
+    finally
+      PostJSON.Free;
+    end;
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressPost.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Title := Title;
+        Result.Content := Content;
+        Result.Status := Status;
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+
 
 function TWordPressApi.CreatePage(const Title, Content: string; const Status: string = 'draft'): Boolean;
 var
@@ -1867,10 +1991,11 @@ begin
         // Extract fields from JSONBlock and assign them to Result's properties
         Result.ID := JSONBlock.GetValue<Integer>('id');
         Result.slug := JSONBlock.GetValue<string>('slug');
+        Result.Content := JSONBlock.GetValue<string>('content.raw');
         Result.Status := JSONBlock.GetValue<string>('status');
         Result.&Type := JSONBlock.GetValue<string>('type');
         Result.Title := JSONBlock.GetValue<string>('title.raw');
-        Result.guid := JSONBlock.GetValue<string>('guid');
+        Result.guid := JSONBlock.GetValue<string>('guid.rendered');
 
         // ... extract other fields as needed ...
       end;

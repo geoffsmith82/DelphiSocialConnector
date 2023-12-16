@@ -41,14 +41,14 @@ end;
 
 procedure TWordpressEditorForm.btnCancelClick(Sender: TObject);
 begin
-  ModalResult := Vcl.Controls.TModalResult(mbCancel);
   Close;
+  ModalResult := Vcl.Controls.TModalResult(mbCancel);
 end;
 
 procedure TWordpressEditorForm.btnMakeWordpressPostClick(Sender: TObject);
 begin
-  ModalResult := Vcl.Controls.TModalResult(mbOK);
   Close;
+  ModalResult := Vcl.Controls.TModalResult(mbOK);
 end;
 
 end.

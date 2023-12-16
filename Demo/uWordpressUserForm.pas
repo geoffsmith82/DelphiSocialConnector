@@ -27,6 +27,7 @@ type
     btnCancel: TButton;
     lblPassword: TLabel;
     edtPassword: TEdit;
+    procedure FormCreate(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
   private
@@ -39,16 +40,21 @@ implementation
 
 {$R *.dfm}
 
-procedure TFormWordpressUser.btnCancelClick(Sender: TObject);
+procedure TFormWordpressUser.FormCreate(Sender: TObject);
 begin
   ModalResult := Vcl.Controls.TModalResult(mbCancel);
+end;
+
+procedure TFormWordpressUser.btnCancelClick(Sender: TObject);
+begin
   Close;
+  ModalResult := Vcl.Controls.TModalResult(mbCancel);
 end;
 
 procedure TFormWordpressUser.btnOKClick(Sender: TObject);
 begin
-  ModalResult := Vcl.Controls.TModalResult(mbOK);
   Close;
+  ModalResult := Vcl.Controls.TModalResult(mbOK);
 end;
 
 end.

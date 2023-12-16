@@ -131,6 +131,7 @@ object FormWordpress: TFormWordpress
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        OnDblClick = lvPostsDblClick
       end
       object pnlPosts: TPanel
         Left = 0
@@ -187,6 +188,7 @@ object FormWordpress: TFormWordpress
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
+        OnDblClick = lvBlocksDblClick
       end
       object pnlBlock: TPanel
         Left = 0

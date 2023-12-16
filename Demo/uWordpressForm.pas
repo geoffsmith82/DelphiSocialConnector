@@ -63,8 +63,10 @@ type
     procedure btnWebBrowserClick(Sender: TObject);
     procedure btnAddPostClick(Sender: TObject);
     procedure btnAddUserClick(Sender: TObject);
+    procedure lvBlocksDblClick(Sender: TObject);
     procedure lvMediaDblClick(Sender: TObject);
     procedure lvPagesClick(Sender: TObject);
+    procedure lvPostsDblClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TInifile;
@@ -490,6 +492,29 @@ begin
   end;
 end;
 
+procedure TFormWordpress.lvBlocksDblClick(Sender: TObject);
+var
+  WordpressEditorForm : TWordpressEditorForm;
+  BlockId : Integer;
+  block : TWordPressBlock;
+begin
+  WordpressEditorForm := TWordpressEditorForm.Create(nil);
+  try
+    BlockId := lvBlocks.Selected.Caption.ToInteger;
+    block := FWp.RetrieveBlock(BlockId);
+    WordpressEditorForm.edtTitle.Text := block.Title;
+    WordpressEditorForm.Memo1.Text := block.Content;
+    WordpressEditorForm.ShowModal;
+    if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.UpdateBlock(BlockId, WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, block.slug, block.&Type);
+    end;
+  finally
+    FreeAndNil(WordpressEditorForm);
+    FreeAndNil(block);
+  end;
+end;
+
 procedure TFormWordpress.lvMediaDblClick(Sender: TObject);
 var
   FormImageDisplay: TFormImageDisplay;
@@ -525,6 +550,29 @@ begin
   finally
     FreeAndNil(WordpressEditorForm);
     FreeAndNil(page);
+  end;
+end;
+
+procedure TFormWordpress.lvPostsDblClick(Sender: TObject);
+var
+  WordpressEditorForm : TWordpressEditorForm;
+  PostId : Integer;
+  post : TWordPressPost;
+begin
+  WordpressEditorForm := TWordpressEditorForm.Create(nil);
+  try
+    PostId := lvPages.Selected.Caption.ToInteger;
+    post := FWp.RetrievePost(PostId);
+    WordpressEditorForm.edtTitle.Text := post.Title;
+    WordpressEditorForm.Memo1.Text := post.Content;
+    WordpressEditorForm.ShowModal;
+    if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.UpdatePost(PostId, WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, post.Status);
+    end;
+  finally
+    FreeAndNil(WordpressEditorForm);
+    FreeAndNil(post);
   end;
 end;
 
