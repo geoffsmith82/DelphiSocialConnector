@@ -27,16 +27,16 @@ type
     { Private declarations }
   public
     { Public declarations }
-    procedure ShowImage(url: string);
+    procedure ShowImage(const url: string);
   end;
 
 implementation
 
 {$R *.dfm}
 
-{ TForm2 }
+{ TFormImageDisplay }
 
-procedure TFormImageDisplay.ShowImage(url: string);
+procedure TFormImageDisplay.ShowImage(const url: string);
 var
   HTTPClient: TNetHTTPClient;
   ResponseStream: TMemoryStream;

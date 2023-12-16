@@ -237,6 +237,7 @@ begin
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/posts/{id}';
     RestRequest.AddParameter('id', PostID.ToString, pkURLSEGMENT);
+    RestRequest.AddParameter('context', 'edit');
 
     RestRequest.Execute;
 

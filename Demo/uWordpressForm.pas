@@ -562,7 +562,7 @@ var
 begin
   WordpressEditorForm := TWordpressEditorForm.Create(nil);
   try
-    PostId := lvPages.Selected.Caption.ToInteger;
+    PostId := lvPosts.Selected.Caption.ToInteger;
     post := FWp.RetrievePost(PostId);
     WordpressEditorForm.edtTitle.Text := post.Title;
     WordpressEditorForm.Memo1.Text := post.Content;
