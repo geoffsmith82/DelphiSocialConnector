@@ -11,11 +11,17 @@ uses
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
-  Vcl.Dialogs
+  Vcl.Dialogs,
+  Vcl.StdCtrls
   ;
 
 type
   TFormWordpressMedia = class(TForm)
+    OpenDialog: TOpenDialog;
+    btnAddMedia: TButton;
+    btnCancel: TButton;
+    procedure btnAddMediaClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -25,5 +31,17 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TFormWordpressMedia.btnAddMediaClick(Sender: TObject);
+begin
+  ModalResult := Vcl.Controls.TModalResult(mbOK);
+  Close;
+end;
+
+procedure TFormWordpressMedia.btnCancelClick(Sender: TObject);
+begin
+  ModalResult := Vcl.Controls.TModalResult(mbCancel);
+  Close;
+end;
 
 end.
