@@ -47,6 +47,7 @@ type
     pnlMedia: TPanel;
     btnDeleteMedia: TButton;
     btnAddPage: TButton;
+    btnAddPost: TButton;
     procedure btnAddPageClick(Sender: TObject);
     procedure btnDeleteBlockClick(Sender: TObject);
     procedure btnDeleteMediaClick(Sender: TObject);
@@ -56,6 +57,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnWebBrowserClick(Sender: TObject);
+    procedure btnAddPostClick(Sender: TObject);
     procedure lvMediaDblClick(Sender: TObject);
   private
     { Private declarations }
@@ -321,6 +323,8 @@ begin
       finally
         FreeAndNil(pages);
       end;
+      Close;
+      ShowMessage('Page Created');
     end;
   finally
     FreeAndNil(WordpressEditorForm);
@@ -336,6 +340,42 @@ begin
     FormWebBrowser.ShowModal;
   finally
     FreeAndNil(FormWebBrowser);
+  end;
+end;
+
+procedure TFormWordpress.btnAddPostClick(Sender: TObject);
+var
+  posts : TObjectList<TWordPressPost>;
+  WordpressEditorForm: TWordpressEditorForm;
+  i : Integer;
+  lvPostItem : TListItem;
+begin
+  WordpressEditorForm := TWordpressEditorForm.Create(nil);
+  try
+    WordpressEditorForm.ShowModal;
+    if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.CreatePost(WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, 'draft');
+      lvPages.Items.Clear;
+      posts := FWp.ListPosts('');
+      try
+        Memo1.Lines.Add('=== POSTS ===');
+        for i := 0 to posts.Count - 1 do
+        begin
+          lvPostItem := lvPosts.Items.Add;
+          lvPostItem.Caption := posts[i].ID.ToString;
+          lvPostItem.SubItems.Add(posts[i].Title);
+          lvPostItem.SubItems.Add(posts[i].Status);
+          Memo1.Lines.Add(posts[i].ID.ToString  + ' ' + posts[i].Title);
+        end;
+      finally
+        FreeAndNil(posts);
+      end;
+      Close;
+      ShowMessage('Post Created');
+    end;
+  finally
+    FreeAndNil(WordpressEditorForm);
   end;
 end;
 

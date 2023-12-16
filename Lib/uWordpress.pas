@@ -100,7 +100,7 @@ type
   public
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
-    function CreatePost(const Title, Content: string): Boolean;
+    function CreatePost(const Title, Content: string; const Status: string = 'draft'): Boolean;
     function ListPosts(const status: string = ''): TObjectList<TWordPressPost>; overload;
     function DeletePost(const PostID: Integer): Boolean;
   public // Page functions
@@ -154,7 +154,7 @@ begin
   FPassword := Password;
 end;
 
-function TWordPressApi.CreatePost(const Title, Content: string): Boolean;
+function TWordPressApi.CreatePost(const Title, Content: string; const Status: string = 'draft'): Boolean;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -184,7 +184,7 @@ begin
     try
       JSONBody.AddPair('title', Title);
       JSONBody.AddPair('content', Content);
-      JSONBody.AddPair('status', 'draft');
+      JSONBody.AddPair('status', Status);
 
       RestRequest.AddBody(JSONBody);
 
