@@ -17,22 +17,13 @@ object FormWordpress: TFormWordpress
     628
     442)
   TextHeight = 15
-  object btnWordpress: TButton
-    Left = 536
-    Top = 8
-    Width = 75
-    Height = 25
-    Caption = 'Wordpress'
-    TabOrder = 0
-    OnClick = btnWordpressClick
-  end
   object btnWebBrowser: TButton
     Left = 111
     Top = 8
     Width = 97
     Height = 25
     Caption = 'Web Browser'
-    TabOrder = 1
+    TabOrder = 0
     OnClick = btnWebBrowserClick
   end
   object PageControl1: TPageControl
@@ -42,7 +33,7 @@ object FormWordpress: TFormWordpress
     Height = 393
     ActivePage = Pages
     Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 2
+    TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'Log'
       object Memo1: TMemo

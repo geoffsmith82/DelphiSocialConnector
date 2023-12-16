@@ -21,7 +21,6 @@ uses
 
 type
   TFormWordpress = class(TForm)
-    btnWordpress: TButton;
     btnWebBrowser: TButton;
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
@@ -56,7 +55,6 @@ type
     procedure btnDeleteUserClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure btnWordpressClick(Sender: TObject);
     procedure btnWebBrowserClick(Sender: TObject);
     procedure lvMediaDblClick(Sender: TObject);
   private
@@ -149,16 +147,6 @@ var
   WordpressSiteURL : string;
   WordpressUsername : string;
   WordpressPassword : string;
-begin
-  WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
-  WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
-  WordpressPassword := FSettings.ReadString('Wordpress', 'Password', '');
-
-  FWp := TWordPressApi.Create(WordpressSiteURL, WordpressUsername, WordpressPassword);
-end;
-
-procedure TFormWordpress.btnWordpressClick(Sender: TObject);
-var
   posts : TObjectList<TWordPressPost>;
   pages : TObjectList<TWordPressPage>;
   blocks : TObjectList<TWordPressBlock>;
@@ -176,6 +164,12 @@ var
   lvUserItem : TListItem;
   lvMediaItem : TListItem;
 begin
+  WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
+  WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
+  WordpressPassword := FSettings.ReadString('Wordpress', 'Password', '');
+
+  FWp := TWordPressApi.Create(WordpressSiteURL, WordpressUsername, WordpressPassword);
+
   FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
   posts := FWp.ListPosts('');
   try
