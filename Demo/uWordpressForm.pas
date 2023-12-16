@@ -177,7 +177,6 @@ begin
 
   FWp := TWordPressApi.Create(WordpressSiteURL, WordpressUsername, WordpressPassword);
 
-  FWp.CreatePost('Test Title', '<h1>Test Content</h1>This is some content');
   posts := FWp.ListPosts('');
   try
     Memo1.Lines.Add('=== POSTS ===');
@@ -328,7 +327,6 @@ begin
       finally
         FreeAndNil(blocks);
       end;
-      Close;
       ShowMessage('Block Created');
     end;
   finally
@@ -364,7 +362,6 @@ begin
       finally
         FreeAndNil(pages);
       end;
-      Close;
       ShowMessage('Page Created');
     end;
   finally
@@ -412,7 +409,6 @@ begin
       finally
         FreeAndNil(posts);
       end;
-      Close;
       ShowMessage('Post Created');
     end;
   finally
@@ -448,7 +444,6 @@ begin
       finally
         FreeAndNil(users);
       end;
-      Close;
       ShowMessage('User Created');
     end;
   finally

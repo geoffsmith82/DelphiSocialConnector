@@ -97,6 +97,7 @@ type
     FPassword: string;
     function ListPosts(var posts: TObjectList<TWordPressPost>; const status: string = ''): Boolean; overload;
     function ListPages(var pages: TObjectList<TWordPressPage>; const status: string = ''): Boolean; overload;
+    function ListBlocks(var blocks: TObjectList<TWordPressBlock>; const status: string = ''): Boolean; overload;
   public
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
@@ -134,7 +135,7 @@ type
   public
     function CreateBlock(const Title, Content, Status: string): TWordPressBlock;
     function UpdateBlock(const BlockID: Integer; const Title, Content, Slug, BlockType: string): TWordPressBlock;
-    function ListBlocks: TObjectList<TWordPressBlock>;
+    function ListBlocks(const status: string = ''): TObjectList<TWordPressBlock>; overload;
     function RetrieveBlock(const BlockID: Integer): TWordPressBlock;
     function DeleteBlock(const BlockID: Integer): Boolean;
   end;
@@ -1623,7 +1624,22 @@ begin
   end;
 end;
 
-function TWordPressApi.ListBlocks: TObjectList<TWordPressBlock>;
+function TWordPressApi.ListBlocks(const status: string = ''): TObjectList<TWordPressBlock>;
+begin
+  Result := TObjectList<TWordPressBlock>.Create;
+  if status.IsEmpty then
+  begin
+    ListBlocks(Result, 'publish');
+    ListBlocks(Result, 'future');
+    ListBlocks(Result, 'draft');
+    ListBlocks(Result, 'pending');
+    ListBlocks(Result, 'private');
+  end
+  else
+    ListBlocks(Result, status);
+end;
+
+function TWordPressApi.ListBlocks(var blocks: TObjectList<TWordPressBlock>; const status: string = ''): Boolean;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -1634,7 +1650,6 @@ var
   Block: TWordPressBlock;
   JSONBlock: TJSONObject;
 begin
-  Result := TObjectList<TWordPressBlock>.Create;
 
   RestClient := nil;
   RestRequest := nil;
@@ -1651,6 +1666,9 @@ begin
     RestRequest.Response := RestResponse;
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/blocks'; // Replace 'blocks' with the actual endpoint for your blocks
+    if not status.IsEmpty then
+      RestRequest.Params.AddItem('status', status);
+
 
     RestRequest.Execute;
 
@@ -1670,7 +1688,7 @@ begin
         Block.Status := JSONBlock.GetValue<String>('status');
         // ... extract other fields as needed ...
 
-        Result.Add(Block);
+        blocks.Add(Block);
       end;
     end;
   finally
