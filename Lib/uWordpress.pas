@@ -107,6 +107,8 @@ type
     function DeletePost(const PostID: Integer): Boolean;
   public // Page functions
     function CreatePage(const Title, Content: string; const Status: string = 'draft'): Boolean;
+    function UpdatePage(const PageID: Integer; const Title, Content, Status: string): TWordPressPage;
+    function RetrievePage(const PageID: Integer): TWordPressPage;
     function ListPages(const status: string = ''): TObjectList<TWordPressPage>; overload;
     function DeletePage(const PageID: Integer): Boolean;
   public  // User functions
@@ -259,6 +261,127 @@ begin
   end;
 end;
 
+function TWordPressApi.UpdatePage(const PageID: Integer; const Title, Content, Status: string): TWordPressPage;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  PageJSON: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmPOST; // WordPress typically uses POST for updates
+    RestRequest.Resource := 'wp/v2/pages/{id}';
+    RestRequest.AddParameter('id', PageID.ToString, pkURLSEGMENT);
+
+    // Create JSON object with updated page details
+    PageJSON := TJSONObject.Create;
+    try
+      PageJSON.AddPair('title', TJSONObject.Create.AddPair('rendered', Title));
+      PageJSON.AddPair('content', TJSONObject.Create.AddPair('rendered', Content));
+      PageJSON.AddPair('status', Status);
+
+      RestRequest.AddBody(PageJSON.ToJSON, ctAPPLICATION_JSON);
+    finally
+      PageJSON.Free;
+    end;
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        Result := TWordPressPage.Create;
+        Result.ID := (JSONValue as TJSONObject).GetValue<Integer>('id');
+        Result.Title := Title;
+        Result.Content := Content;
+        Result.Status := Status;
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
+
+
+function TWordPressApi.RetrievePage(const PageID: Integer): TWordPressPage;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  Authenticator: THTTPBasicAuthenticator;
+  JSONValue: TJSONValue;
+  JSONPage: TJSONObject;
+begin
+  Result := nil;
+
+  RestClient := nil;
+  RestRequest := nil;
+  RestResponse := nil;
+  Authenticator := nil;
+  try
+    RestClient := TRESTClient.Create(FEndpoint);
+    RestRequest := TRESTRequest.Create(nil);
+    RestResponse := TRESTResponse.Create(nil);
+    Authenticator := THTTPBasicAuthenticator.Create(FUsername, FPassword);
+    RestClient.Authenticator := Authenticator;
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := 'wp/v2/pages/{id}';
+    RestRequest.AddParameter('id', PageID.ToString, pkURLSEGMENT);
+    RestRequest.AddParameter('context', 'edit');
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then  // HTTP 200 OK
+    begin
+      JSONValue := RestResponse.JSONValue;
+      if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+      begin
+        JSONPage := JSONValue as TJSONObject;
+        Result := TWordPressPage.Create;
+        Result.ID := JSONPage.GetValue<Integer>('id');
+        Result.Title := JSONPage.GetValue<string>('title.raw');
+        Result.Content := JSONPage.GetValue<string>('content.raw');
+        Result.Slug := JSONPage.GetValue<string>('slug');
+        Result.Status := JSONPage.GetValue<string>('status');
+        Result.&Type := JSONPage.GetValue<string>('type');
+        Result.Date := ISO8601ToDate(JSONPage.GetValue<string>('date'));
+        Result.Author := JSONPage.GetValue<Integer>('author');
+        Result.Excerpt := JSONPage.GetValue<string>('excerpt.raw');
+        // ... extract other fields as needed ...
+      end;
+    end;
+  finally
+    RestRequest.Free;
+    RestResponse.Free;
+    RestClient.Free;
+    Authenticator.Free;
+  end;
+end;
 
 function TWordPressApi.CreateUser(const Username, Email, Password: string; const Role: string = 'subscriber'): Boolean;
 var

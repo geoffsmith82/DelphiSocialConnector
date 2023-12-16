@@ -10,6 +10,7 @@ object WordpressEditorForm: TWordpressEditorForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OnCreate = FormCreate
   TextHeight = 15
   object Memo1: TMemo
     Left = 8
@@ -18,6 +19,7 @@ object WordpressEditorForm: TWordpressEditorForm
     Height = 289
     Lines.Strings = (
       'Memo1')
+    ScrollBars = ssBoth
     TabOrder = 0
   end
   object btnMakeWordpressPost: TButton

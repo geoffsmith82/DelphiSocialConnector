@@ -64,6 +64,7 @@ type
     procedure btnAddPostClick(Sender: TObject);
     procedure btnAddUserClick(Sender: TObject);
     procedure lvMediaDblClick(Sender: TObject);
+    procedure lvPagesClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TInifile;
@@ -501,6 +502,29 @@ begin
     finally
       FreeAndNil(FormImageDisplay);
     end;
+  end;
+end;
+
+procedure TFormWordpress.lvPagesClick(Sender: TObject);
+var
+  WordpressEditorForm : TWordpressEditorForm;
+  PageId : Integer;
+  page : TWordPressPage;
+begin
+  WordpressEditorForm := TWordpressEditorForm.Create(nil);
+  try
+    PageId := lvPages.Selected.Caption.ToInteger;
+    page := FWp.RetrievePage(PageId);
+    WordpressEditorForm.edtTitle.Text := page.Title;
+    WordpressEditorForm.Memo1.Text := page.Content;
+    WordpressEditorForm.ShowModal;
+    if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    begin
+      FWp.UpdatePage(PageId, WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, page.Status);
+    end;
+  finally
+    FreeAndNil(WordpressEditorForm);
+    FreeAndNil(page);
   end;
 end;
 

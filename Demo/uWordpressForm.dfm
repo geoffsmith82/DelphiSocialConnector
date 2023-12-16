@@ -74,6 +74,7 @@ object FormWordpress: TFormWordpress
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
+        OnDblClick = lvPagesClick
       end
       object pnlPage: TPanel
         Left = 0

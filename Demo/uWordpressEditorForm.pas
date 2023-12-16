@@ -21,6 +21,7 @@ type
     btnMakeWordpressPost: TButton;
     btnCancel: TButton;
     edtTitle: TEdit;
+    procedure FormCreate(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure btnMakeWordpressPostClick(Sender: TObject);
   private
@@ -32,6 +33,11 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TWordpressEditorForm.FormCreate(Sender: TObject);
+begin
+  ModalResult := Vcl.Controls.TModalResult(mbCancel);
+end;
 
 procedure TWordpressEditorForm.btnCancelClick(Sender: TObject);
 begin
