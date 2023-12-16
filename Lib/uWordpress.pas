@@ -1653,7 +1653,7 @@ var
   Block: TWordPressBlock;
   JSONBlock: TJSONObject;
 begin
-
+  Result := False;
   RestClient := nil;
   RestRequest := nil;
   RestResponse := nil;
@@ -1693,6 +1693,7 @@ begin
 
         blocks.Add(Block);
       end;
+      Result := True;
     end;
   finally
     RestRequest.Free;

@@ -32,11 +32,8 @@ object FormDiscourse: TFormDiscourse
         Align = alClient
         Lines.Strings = (
           'Memo1')
+        ScrollBars = ssBoth
         TabOrder = 0
-        ExplicitLeft = 176
-        ExplicitTop = 104
-        ExplicitWidth = 185
-        ExplicitHeight = 89
       end
     end
     object tsUsers: TTabSheet

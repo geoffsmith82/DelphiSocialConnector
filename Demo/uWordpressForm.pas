@@ -305,13 +305,15 @@ var
   WordpressEditorForm: TWordpressEditorForm;
   i : Integer;
   lvBlockItem : TListItem;
+  block : TWordPressBlock;
 begin
   WordpressEditorForm := TWordpressEditorForm.Create(nil);
   try
     WordpressEditorForm.ShowModal;
     if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
     begin
-      FWp.CreateBlock(WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, 'draft');
+      block := FWp.CreateBlock(WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, 'publish');
+      FreeAndNil(block);
       lvBlocks.Items.Clear;
       blocks := FWp.ListBlocks;
       try
@@ -337,6 +339,7 @@ end;
 procedure TFormWordpress.btnAddMediaClick(Sender: TObject);
 var
   mediaList : TObjectList<TWordPressMedia>;
+  media : TWordPressMedia;
   FormWordpressMedia : TFormWordpressMedia;
   i : Integer;
   lvMediaItem : TListItem;
@@ -346,7 +349,8 @@ begin
     FormWordpressMedia.ShowModal;
     if FormWordpressMedia.ModalResult = Vcl.Controls.TModalResult(mbOK) then
     begin
-      FWp.CreateMedia(FormWordpressMedia.edtFilename.Text, FormWordpressMedia.edtTitle.Text);
+      media := FWp.CreateMedia(FormWordpressMedia.edtFilename.Text, FormWordpressMedia.edtTitle.Text);
+      FreeAndNil(media);
       lvMedia.Items.Clear;
       mediaList := FWp.ListMedia;
       try
@@ -428,7 +432,7 @@ begin
     if WordpressEditorForm.ModalResult = Vcl.Controls.TModalResult(mbOK) then
     begin
       FWp.CreatePost(WordpressEditorForm.edtTitle.Text, WordpressEditorForm.Memo1.Text, 'draft');
-      lvPages.Items.Clear;
+      lvPosts.Items.Clear;
       posts := FWp.ListPosts('');
       try
         Memo1.Lines.Add('=== POSTS ===');
