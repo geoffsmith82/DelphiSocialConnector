@@ -19,7 +19,7 @@ uses
   ;
 
 type
-  TForm1 = class(TForm)
+  TFormWebBrowser = class(TForm)
     EdgeBrowser: TEdgeBrowser;
     procedure EdgeBrowserCreateWebViewCompleted(Sender: TCustomEdgeBrowser;
         AResult: HRESULT);
@@ -33,9 +33,6 @@ type
     { Public declarations }
   end;
 
-var
-  Form1: TForm1;
-
 implementation
 
 {$R *.dfm}
@@ -45,7 +42,7 @@ uses
   Winapi.EdgeUtils
   ;
 
-procedure TForm1.EdgeBrowserCreateWebViewCompleted(Sender: TCustomEdgeBrowser;
+procedure TFormWebBrowser.EdgeBrowserCreateWebViewCompleted(Sender: TCustomEdgeBrowser;
     AResult: HRESULT);
 begin
 {$IFDEF DEBUG}
@@ -74,7 +71,7 @@ begin
   end;
 end;
 
-procedure TForm1.EdgeBrowserWebResourceRequested(Sender: TCustomEdgeBrowser;
+procedure TFormWebBrowser.EdgeBrowserWebResourceRequested(Sender: TCustomEdgeBrowser;
     Args: TWebResourceRequestedEventArgs);
 begin
 {$IFDEF DEBUG}
@@ -100,7 +97,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TFormWebBrowser.FormCreate(Sender: TObject);
 begin
   FBlockImages := False;
   EdgeBrowser.OnDownloadStarting := nil;

@@ -1,7 +1,7 @@
-object Form1: TForm1
+object FormWebBrowser: TFormWebBrowser
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = ' Web Browser'
   ClientHeight = 441
   ClientWidth = 624
   Color = clBtnFace
@@ -24,9 +24,5 @@ object Form1: TForm1
     UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
     OnCreateWebViewCompleted = EdgeBrowserCreateWebViewCompleted
     OnWebResourceRequested = EdgeBrowserWebResourceRequested
-    ExplicitLeft = 176
-    ExplicitTop = 120
-    ExplicitWidth = 100
-    ExplicitHeight = 41
   end
 end

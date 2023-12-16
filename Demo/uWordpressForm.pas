@@ -15,7 +15,8 @@ uses
   Vcl.StdCtrls,
   Vcl.ComCtrls,
   Vcl.ExtCtrls,
-  uWordpress
+  uWordpress,
+  uWordpressEditorForm
   ;
 
 type
@@ -46,6 +47,8 @@ type
     lvMedia: TListView;
     pnlMedia: TPanel;
     btnDeleteMedia: TButton;
+    btnAddPage: TButton;
+    procedure btnAddPageClick(Sender: TObject);
     procedure btnDeleteBlockClick(Sender: TObject);
     procedure btnDeleteMediaClick(Sender: TObject);
     procedure btnDeletePageClick(Sender: TObject);
@@ -296,9 +299,28 @@ begin
   FSettings := inSettings;
 end;
 
-procedure TFormWordpress.btnWebBrowserClick(Sender: TObject);
+procedure TFormWordpress.btnAddPageClick(Sender: TObject);
+var
+  WordpressEditorForm: TWordpressEditorForm;
 begin
-  Form1.ShowModal;
+  WordpressEditorForm := TWordpressEditorForm.Create(nil);
+  try
+    WordpressEditorForm.ShowModal;
+  finally
+    FreeAndNil(WordpressEditorForm);
+  end;
+end;
+
+procedure TFormWordpress.btnWebBrowserClick(Sender: TObject);
+var
+  FormWebBrowser: TFormWebBrowser;
+begin
+  FormWebBrowser := TFormWebBrowser.Create(nil);
+  try
+    FormWebBrowser.ShowModal;
+  finally
+    FreeAndNil(FormWebBrowser);
+  end;
 end;
 
 procedure TFormWordpress.lvMediaDblClick(Sender: TObject);

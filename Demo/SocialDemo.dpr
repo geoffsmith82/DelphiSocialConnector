@@ -20,12 +20,13 @@ uses
   uTwitter in '..\Lib\uTwitter.pas',
   uWordpress in '..\Lib\uWordpress.pas',
   uDiscourse in '..\Lib\uDiscourse.pas',
-  uWebBrowser in 'uWebBrowser.pas' {Form1},
+  uWebBrowser in 'uWebBrowser.pas' {FormWebBrowser},
   uImageDisplayForm in 'uImageDisplayForm.pas' {FormImageDisplay},
   uTwitterForm in 'uTwitterForm.pas' {FormTwitter},
   uDiscourseForm in 'uDiscourseForm.pas' {FormDiscourse},
   uFacebookForm in 'uFacebookForm.pas' {FormFacebook},
-  uMainForm in 'uMainForm.pas' {FormMain};
+  uMainForm in 'uMainForm.pas' {FormMain},
+  uWordpressEditorForm in 'uWordpressEditorForm.pas' {WordpressEditorForm};
 
 {$R *.res}
 

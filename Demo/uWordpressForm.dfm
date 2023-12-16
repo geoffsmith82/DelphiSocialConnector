@@ -83,7 +83,6 @@ object FormWordpress: TFormWordpress
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 363
       end
       object pnlPage: TPanel
         Left = 0
@@ -92,9 +91,6 @@ object FormWordpress: TFormWordpress
         Height = 41
         Align = alBottom
         TabOrder = 1
-        ExplicitLeft = 232
-        ExplicitTop = 232
-        ExplicitWidth = 185
         object btnDeletePage: TButton
           Left = 520
           Top = 5
@@ -103,6 +99,15 @@ object FormWordpress: TFormWordpress
           Caption = 'Delete Page'
           TabOrder = 0
           OnClick = btnDeletePageClick
+        end
+        object btnAddPage: TButton
+          Left = 432
+          Top = 6
+          Width = 75
+          Height = 25
+          Caption = 'Add Page'
+          TabOrder = 1
+          OnClick = btnAddPageClick
         end
       end
     end
@@ -134,7 +139,6 @@ object FormWordpress: TFormWordpress
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 363
       end
       object pnlPosts: TPanel
         Left = 0
@@ -143,9 +147,6 @@ object FormWordpress: TFormWordpress
         Height = 41
         Align = alBottom
         TabOrder = 1
-        ExplicitLeft = 264
-        ExplicitTop = 248
-        ExplicitWidth = 185
         object btnDeletePost: TButton
           Left = 528
           Top = 6
@@ -185,7 +186,6 @@ object FormWordpress: TFormWordpress
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 363
       end
       object pnlBlock: TPanel
         Left = 0
@@ -194,9 +194,6 @@ object FormWordpress: TFormWordpress
         Height = 41
         Align = alBottom
         TabOrder = 1
-        ExplicitLeft = 272
-        ExplicitTop = 240
-        ExplicitWidth = 185
         object btnDeleteBlock: TButton
           Left = 528
           Top = 6
@@ -237,7 +234,6 @@ object FormWordpress: TFormWordpress
         ParentDoubleBuffered = False
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 363
       end
       object pnlUser: TPanel
         Left = 0
@@ -246,9 +242,6 @@ object FormWordpress: TFormWordpress
         Height = 41
         Align = alBottom
         TabOrder = 1
-        ExplicitLeft = 320
-        ExplicitTop = 312
-        ExplicitWidth = 185
         object btnDeleteUser: TButton
           Left = 520
           Top = 5
@@ -294,9 +287,6 @@ object FormWordpress: TFormWordpress
         Height = 41
         Align = alBottom
         TabOrder = 1
-        ExplicitLeft = 216
-        ExplicitTop = 160
-        ExplicitWidth = 185
         object btnDeleteMedia: TButton
           Left = 520
           Top = 5

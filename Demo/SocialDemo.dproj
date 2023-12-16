@@ -95,7 +95,7 @@
         <DCCReference Include="..\Lib\uWordpress.pas"/>
         <DCCReference Include="..\Lib\uDiscourse.pas"/>
         <DCCReference Include="uWebBrowser.pas">
-            <Form>Form1</Form>
+            <Form>FormWebBrowser</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="uImageDisplayForm.pas">
@@ -116,6 +116,10 @@
         </DCCReference>
         <DCCReference Include="uMainForm.pas">
             <Form>FormMain</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uWordpressEditorForm.pas">
+            <Form>WordpressEditorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
