@@ -1286,6 +1286,8 @@ begin
     RestRequest.Method := rmGET;
     RestRequest.Resource := 'wp/v2/media';
 
+    RestRequest.AddParameter('context', 'edit');
+
     RestRequest.Execute;
 
     if RestResponse.StatusCode = 200 then  // HTTP 200 OK
@@ -1296,7 +1298,7 @@ begin
         JSONMedia := JSONArray.Items[I] as TJSONObject;
         MediaItem := TWordPressMedia.Create;
         MediaItem.ID := JSONMedia.GetValue<Integer>('id');
-        MediaItem.Title := JSONMedia.GetValue<string>('title.rendered');
+        MediaItem.Title := JSONMedia.GetValue<string>('title.raw');
         MediaItem.URL := JSONMedia.GetValue<string>('source_url');
         MediaItem.Status := JSONMedia.GetValue<string>('status');
         // ... extract other fields as needed ...
