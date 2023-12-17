@@ -1214,16 +1214,11 @@ begin
     // Set header for file upload
     RestRequest.Params.AddItem('Content-Disposition', 'attachment; filename="' + ExtractFileName(FilePath) + '"', pkHTTPHEADER, [poDoNotEncode]);
 
-    mime := TMimeTypes.Create;
-    try
-      mime.AddDefTypes;
-      if mime.GetFileInfo(FilePath, mimeType, kind) then
-      begin
-        RestRequest.Params.AddHeader('Content-Type', mimeType);//'application/octet-stream');
-      end;
-    finally
-      FreeAndNil(mime);
+    if TMimeTypes.Default.GetFileInfo(FilePath, mimeType, kind) then
+    begin
+      RestRequest.Params.AddHeader('Content-Type', mimeType);//'application/octet-stream');
     end;
+
     if not Title.IsEmpty then
       RestRequest.Params.AddItem('title', Title, pkQUERY);
 

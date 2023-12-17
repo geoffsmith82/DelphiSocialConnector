@@ -69,3 +69,4 @@ __recovery/
 modules/
 Demo/Win32/Debug/SocialDemo.ini
 Demo/Win32/Debug/CustomCache
+Demo/Win32/Debug/SocialDemo.exe.WebView2
