@@ -50,6 +50,10 @@ type
     btnAddBlock: TButton;
     btnAddUser: TButton;
     btnAddMedia: TButton;
+    tsCategories: TTabSheet;
+    tsPlugins: TTabSheet;
+    lvCategories: TListView;
+    lvPlugins: TListView;
     procedure btnAddBlockClick(Sender: TObject);
     procedure btnAddMediaClick(Sender: TObject);
     procedure btnAddPageClick(Sender: TObject);
@@ -280,6 +284,7 @@ begin
     begin
       lvMediaItem := lvMedia.Items.Add;
       lvMediaItem.Caption := mediaList[i].ID.ToString;
+      lvMediaItem.SubItems.Add(mediaList[i].Status);
       lvMediaItem.SubItems.Add(mediaList[i].Title);
       lvMediaItem.SubItems.Add(mediaList[i].URL);
       Memo1.Lines.Add(mediaList[i].Title);
@@ -524,7 +529,7 @@ begin
   begin
     FormImageDisplay := TFormImageDisplay.Create(nil);
     try
-      FormImageDisplay.ShowImage(lvMedia.Selected.SubItems[1]);
+      FormImageDisplay.ShowImage(lvMedia.Selected.SubItems[2]);
     finally
       FreeAndNil(FormImageDisplay);
     end;

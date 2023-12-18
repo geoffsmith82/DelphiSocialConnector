@@ -290,6 +290,10 @@ object FormWordpress: TFormWordpress
             Width = 80
           end
           item
+            Caption = 'Status'
+            Width = 80
+          end
+          item
             Caption = 'Title'
             Width = 400
           end>
@@ -327,6 +331,56 @@ object FormWordpress: TFormWordpress
           TabOrder = 1
           OnClick = btnAddMediaClick
         end
+      end
+    end
+    object tsCategories: TTabSheet
+      Caption = 'Categories'
+      ImageIndex = 6
+      object lvCategories: TListView
+        Left = 0
+        Top = 0
+        Width = 617
+        Height = 363
+        Align = alClient
+        Columns = <
+          item
+            Caption = 'CategoryID'
+            Width = 80
+          end
+          item
+            Caption = 'Name'
+            Width = 200
+          end>
+        ReadOnly = True
+        RowSelect = True
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
+    end
+    object tsPlugins: TTabSheet
+      Caption = 'Plugins'
+      ImageIndex = 7
+      object lvPlugins: TListView
+        Left = 0
+        Top = 0
+        Width = 617
+        Height = 363
+        Align = alClient
+        Columns = <
+          item
+            Caption = 'PluginId'
+            Width = 80
+          end
+          item
+            Caption = 'Status'
+            Width = 80
+          end
+          item
+            Caption = 'Name'
+            Width = 300
+          end>
+        TabOrder = 0
+        ViewStyle = vsReport
       end
     end
   end

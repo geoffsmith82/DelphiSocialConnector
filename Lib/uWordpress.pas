@@ -99,6 +99,7 @@ type
     function ListPosts(var posts: TObjectList<TWordPressPost>; const status: string = ''): Boolean; overload;
     function ListPages(var pages: TObjectList<TWordPressPage>; const status: string = ''): Boolean; overload;
     function ListBlocks(var blocks: TObjectList<TWordPressBlock>; const status: string = ''): Boolean; overload;
+    function ListMedia(var media: TObjectList<TWordPressMedia>; const status: string = ''): Boolean; overload;
   public
     constructor Create(const Endpoint, Username, Password: string);
   public  // Post functions
@@ -125,7 +126,7 @@ type
     function GetSiteSettings: TStringList;
   public
     function CreateMedia(const FilePath: string;  const Title: string = ''): TWordPressMedia;
-    function ListMedia: TObjectList<TWordPressMedia>;
+    function ListMedia(const status: string = ''): TObjectList<TWordPressMedia>; overload;
     function RetrieveMedia(const MediaID: Integer): TWordPressMedia;
     function DeleteMedia(const MediaID: Integer): Boolean;
   public
@@ -1252,7 +1253,21 @@ begin
   end;
 end;
 
-function TWordPressApi.ListMedia: TObjectList<TWordPressMedia>;
+function TWordPressApi.ListMedia(const status: string = ''): TObjectList<TWordPressMedia>;
+begin
+  Result := TObjectList<TWordPressMedia>.Create;
+  if status.IsEmpty then
+  begin
+    ListMedia(Result, 'inherit');
+    ListMedia(Result, 'private');
+    ListMedia(Result, 'trash');
+  end
+  else
+    ListMedia(Result, status);
+end;
+
+
+function TWordPressApi.ListMedia(var media: TObjectList<TWordPressMedia>; const status: string = ''): Boolean;
 var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
@@ -1263,8 +1278,7 @@ var
   MediaItem: TWordPressMedia;
   JSONMedia: TJSONObject;
 begin
-  Result := TObjectList<TWordPressMedia>.Create;
-
+  Result := False;
   RestClient := nil;
   RestRequest := nil;
   RestResponse := nil;
@@ -1282,6 +1296,7 @@ begin
     RestRequest.Resource := 'wp/v2/media';
 
     RestRequest.AddParameter('context', 'edit');
+    RestRequest.AddParameter('status', status);
 
     RestRequest.Execute;
 
@@ -1298,8 +1313,9 @@ begin
         MediaItem.Status := JSONMedia.GetValue<string>('status');
         // ... extract other fields as needed ...
 
-        Result.Add(MediaItem);
+        media.Add(MediaItem);
       end;
+      Result := True;
     end;
   finally
     RestRequest.Free;
