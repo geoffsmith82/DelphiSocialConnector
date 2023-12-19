@@ -178,6 +178,7 @@ var
   lvBlockItem : TListItem;
   lvUserItem : TListItem;
   lvMediaItem : TListItem;
+  lvCategoryItem : TListItem;
 begin
   WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
   WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
@@ -246,6 +247,9 @@ begin
     Memo1.Lines.Add('=== CATEGORY ===');
     for i := 0 to categories.Count - 1 do
     begin
+      lvCategoryItem := lvCategories.Items.Add;
+      lvCategoryItem.Caption := categories[i].ID.ToString;
+      lvCategoryItem.SubItems.Add(categories[i].Name);
       Memo1.Lines.Add('ID=' + categories[i].ID.ToString + ' Name=' + categories[i].Name + ' Slug=' + categories[i].Slug + ' Description=' + categories[i].Description);
     end;
   finally
