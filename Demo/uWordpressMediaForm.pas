@@ -23,6 +23,8 @@ type
     edtFilename: TEdit;
     edtTitle: TEdit;
     btnBrowse: TButton;
+    Label1: TLabel;
+    Label2: TLabel;
     procedure btnAddMediaClick(Sender: TObject);
     procedure btnBrowseClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
@@ -38,7 +40,6 @@ implementation
 
 procedure TFormWordpressMedia.btnAddMediaClick(Sender: TObject);
 begin
-  ModalResult := Vcl.Controls.TModalResult(mbOK);
   Close;
 end;
 
@@ -52,7 +53,6 @@ end;
 
 procedure TFormWordpressMedia.btnCancelClick(Sender: TObject);
 begin
-  ModalResult := Vcl.Controls.TModalResult(mbCancel);
   Close;
 end;
 

@@ -378,8 +378,7 @@ var
 begin
   FormWordpressMedia := TFormWordpressMedia.Create(nil);
   try
-    FormWordpressMedia.ShowModal;
-    if FormWordpressMedia.ModalResult = Vcl.Controls.TModalResult(mbOK) then
+    if FormWordpressMedia.ShowModal = mrOK then
     begin
       media := FWp.CreateMedia(FormWordpressMedia.edtFilename.Text, FormWordpressMedia.edtTitle.Text);
       FreeAndNil(media);
