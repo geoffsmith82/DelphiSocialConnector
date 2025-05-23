@@ -54,6 +54,8 @@ type
     tsPlugins: TTabSheet;
     lvCategories: TListView;
     lvPlugins: TListView;
+    tsTags: TTabSheet;
+    lvTags: TListView;
     procedure btnAddBlockClick(Sender: TObject);
     procedure btnAddMediaClick(Sender: TObject);
     procedure btnAddPageClick(Sender: TObject);
@@ -167,6 +169,7 @@ var
   blocks : TObjectList<TWordPressBlock>;
   mediaList : TObjectList<TWordPressMedia>;
   categories : TObjectList<TWordPressCategory>;
+  tags : TObjectList<TWordPressTag>;
   users : TObjectList<TWordPressUser>;
   i : Integer;
   Settings : TStringList;
@@ -179,6 +182,7 @@ var
   lvUserItem : TListItem;
   lvMediaItem : TListItem;
   lvCategoryItem : TListItem;
+  lvTagItem : TListItem;
 begin
   WordpressSiteURL := FSettings.ReadString('Wordpress', 'SiteURL', '');
   WordpressUsername := FSettings.ReadString('Wordpress', 'Username', '');
@@ -254,6 +258,21 @@ begin
     end;
   finally
     FreeAndNil(categories);
+  end;
+
+  tags := FWp.ListTags;
+  try
+    Memo1.Lines.Add('=== TAG ===');
+    for i := 0 to tags.Count - 1 do
+    begin
+      lvTagItem := lvTags.Items.Add;
+      lvTagItem.Caption := tags[i].ID.ToString;
+      lvTagItem.SubItems.Add(tags[i].Name);
+      lvTagItem.SubItems.Add(tags[i].Slug);
+      Memo1.Lines.Add('ID=' + tags[i].ID.ToString + ' Name=' + tags[i].Name + ' Slug=' + tags[i].Slug + ' Description=' + tags[i].Description);
+    end;
+  finally
+    FreeAndNil(tags);
   end;
 
   users := FWp.ListUsers;

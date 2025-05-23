@@ -1,19 +1,6 @@
 program SocialDemo;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugJCL,
-  EDebugExports,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   uWordpressForm in 'uWordpressForm.pas' {FormWordpress},
   uFacebook in '..\Lib\uFacebook.pas',
@@ -29,6 +16,7 @@ uses
   uWordpressEditorForm in 'uWordpressEditorForm.pas' {WordpressEditorForm},
   uWordpressUserForm in 'uWordpressUserForm.pas' {FormWordpressUser},
   uWordpressMediaForm in 'uWordpressMediaForm.pas' {FormWordpressMedia},
+  uWordpressLogin in 'uWordpressLogin.pas' {frmWordpressLogin},
   uDiscourseTopicsForm in 'uDiscourseTopicsForm.pas' {DiscourseTopicsForm};
 
 {$R *.res}

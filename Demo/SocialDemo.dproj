@@ -134,6 +134,10 @@
             <Form>DiscourseTopicsForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uWordpressLogin.pas">
+            <Form>frmWordpressLogin</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

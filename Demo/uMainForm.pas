@@ -17,6 +17,7 @@ uses
   uTwitterForm,
   uDiscourseForm,
   uWordpressForm,
+  uWordpressLogin,
   uFacebookForm
   ;
 
@@ -94,13 +95,22 @@ end;
 
 procedure TFormMain.btnWordpressClick(Sender: TObject);
 var
+  frmWordpressLogin: TfrmWordpressLogin;
   FormWordpress: TFormWordpress;
 begin
-  FormWordpress := TFormWordpress.Create(nil, FSettings);
+  frmWordpressLogin := TfrmWordpressLogin.Create(nil, FSettings);
   try
-    FormWordpress.ShowModal;
+    if frmWordpressLogin.ShowModal = mrOk then
+    begin
+      FormWordpress := TFormWordpress.Create(nil, FSettings);
+      try
+        FormWordpress.ShowModal;
+      finally
+        FreeAndNil(FormWordpress);
+      end;
+    end;
   finally
-    FreeAndNil(FormWordpress);
+    FreeAndNil(frmWordpressLogin);
   end;
 end;
 
